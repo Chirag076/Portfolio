@@ -68,7 +68,7 @@ const App = () => {
       <div className="realtive sticky top-0 bg-black z-[9]">
       <Navbar menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
       </div>
-      <div className="relative flex justify-center items-center flex-1">
+      <div className="relative flex flex-1">
       <Hero
         imageRef={imageRef}
         containerRef={containerRef}

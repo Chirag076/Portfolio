@@ -3,13 +3,13 @@ import { FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
   return (
-    <nav className="flex justify-between items-center px-6 sm:px-8 py-8 sm:py-2 relative z-50">
+    <nav className="flex justify-between items-center px-6 sm:px-8 py-8 sm:py-2 relative z-2">
       {/* Logo */}
       <div>
         <img
           src="./logo2.png"
           alt="Logo"
-          className="h-14 sm:h-14 md:h-16 lg:h-24 w-auto transition-all duration-300"
+          className="h-16 sm:h-14 md:h-16 lg:h-24 w-auto transition-all duration-300"
         />
       </div>
 
@@ -17,7 +17,7 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
       <div
         className="
           hidden md:flex 
-          space-x-8 sm:space-x-12 lg:space-x-20 
+          space-x-8 sm:space-x-12 lg:space-x-12 xl:space-x-24 md:space-x-16
           text-base sm:text-lg md:text-xl lg:text-4xl 
           font-extrabold tracking-wider
         "
@@ -46,8 +46,8 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
         <div
           className="
             absolute top-full left-0 w-full bg-black 
-            flex flex-col items-center space-y-8 sm:space-y-6 py-10 
-            text-3xl sm:text-xl font-extrabold tracking-wider 
+            flex flex-col items-center space-y-8 sm:space-y-8 py-10 
+            text-3xl sm:text-3xl font-extrabold tracking-wider 
             md:hidden z-50
           "
         >
