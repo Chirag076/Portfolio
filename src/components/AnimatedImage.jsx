@@ -8,10 +8,9 @@ const AnimatedImage = ({ imageRef, containerRef, handleMouseMove, handleMouseEnt
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="
-        relative w-full 
-        h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[85vh] xl:h-[90vh] 
-        mt-[-2rem] sm:mt-[-3rem] md:mt-[-4rem] 
-        z-20
+        relative w-full h-full
+        mt-[-4rem] sm:mt-[-1rem] md:mt-[0rem] xl:mt-[-3rem] lg:mt-[-3rem]
+        z-1
       "
     >
       <img
@@ -19,10 +18,11 @@ const AnimatedImage = ({ imageRef, containerRef, handleMouseMove, handleMouseEnt
         src="./photo2.png"
         alt="Chirag"
         className="
-          absolute left-1/2 
-          top-[5%] sm:top-[0%] 
-          w-[160vw] sm:w-[70vw] md:w-[60vw] lg:w-[55vw] xl:w-[160vw] 
-          max-w-[82rem]
+          relative left-[46%] item-center
+          mt-[5%] mb-[-10%] sm:mt-[-7%] 
+          w-[190%] sm:w-[155%] md:w-[116%] lg:w-[250%] xl:w-[147%]
+
+          max-w-[90rem]
           pointer-events-none 
           transition-filter duration-300
         "

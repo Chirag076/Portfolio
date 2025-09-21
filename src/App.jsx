@@ -64,15 +64,19 @@ const App = () => {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div className="bg-black text-white min-h-screen font-sans">
+    <div className="flex flex-col bg-black text-white min-h-screen font-sans">
+      <div className="realtive sticky top-0 bg-black z-[9]">
       <Navbar menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
+      </div>
+      <div className="relative flex flex-1">
       <Hero
         imageRef={imageRef}
         containerRef={containerRef}
         handleMouseMove={handleMouseMove}
         handleMouseEnter={handleMouseEnter}
         handleMouseLeave={handleMouseLeave}
-      />
+        />
+        </div>
     </div>
   );
 };
