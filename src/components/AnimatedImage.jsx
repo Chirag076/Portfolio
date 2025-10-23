@@ -19,8 +19,8 @@ const AnimatedImage = ({ imageRef, containerRef, handleMouseMove, handleMouseEnt
         alt="Chirag"
         className="
           relative left-[46%] item-center
-          mt-[5%] mb-[-10%] sm:mt-[-7%] 
-          w-[190%] sm:w-[155%] md:w-[116%] lg:w-[250%] xl:w-[147%]
+          mt-[5%] mb-[-16%] sm:mt-[-7%] 
+          w-[190%] sm:w-[155%] md:w-[116%] lg:w-[200%] xl:w-[147%]
 
           max-w-[90rem]
           pointer-events-none 

@@ -3,14 +3,17 @@ import { FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
   return (
-    <nav className="flex justify-between items-center px-6 sm:px-8 py-8 sm:py-2 relative z-2">
+    <nav className="flex justify-between items-center px-6 sm:px-8 py-3 sm:py-2 relative z-3">
       {/* Logo */}
       <div>
-        <img
-          src="./logo2.png"
-          alt="Logo"
-          className="h-16 sm:h-14 md:h-16 lg:h-24 w-auto transition-all duration-300"
-        />
+        <a href="#">
+
+          <img
+            src="./logo2.png"
+            alt="Logo"
+            className="h-16 sm:h-14 md:h-16 lg:h-24 w-auto transition-all duration-300"
+          />
+        </a>
       </div>
 
       {/* Desktop Nav */}
