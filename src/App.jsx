@@ -1,7 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-
+import AboutMe from "./components/AboutMe";
+import Services from "./components/Services";
+import Contact from "./components/Contact";
+import Reviews from "./components/Reviews";
+import Projects from "./components/Projects";
 const App = () => {
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -65,18 +69,23 @@ const App = () => {
 
   return (
     <div className="flex flex-col bg-black text-white min-h-screen font-sans">
-      <div className="realtive sticky top-0 bg-black z-[9]">
-      <Navbar menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
+      <div className="realtive sticky top-0 bg-black z-20">
+        <Navbar menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
       </div>
       <div className="relative flex flex-1">
-      <Hero
-        imageRef={imageRef}
-        containerRef={containerRef}
-        handleMouseMove={handleMouseMove}
-        handleMouseEnter={handleMouseEnter}
-        handleMouseLeave={handleMouseLeave}
+        <Hero
+          imageRef={imageRef}
+          containerRef={containerRef}
+          handleMouseMove={handleMouseMove}
+          handleMouseEnter={handleMouseEnter}
+          handleMouseLeave={handleMouseLeave}
         />
-        </div>
+      </div>
+      <AboutMe />
+      <Services />
+      <Projects />
+      <Reviews />
+      <Contact />
     </div>
   );
 };
