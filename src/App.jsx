@@ -6,6 +6,7 @@ import Services from "./components/Services";
 import Contact from "./components/Contact";
 import Reviews from "./components/Reviews";
 import Projects from "./components/Projects";
+import Experience from "./components/Experience";
 const App = () => {
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -83,6 +84,7 @@ const App = () => {
       </div>
       <AboutMe />
       <Services />
+      <Experience />
       <Projects />
       <Reviews />
       <Contact />

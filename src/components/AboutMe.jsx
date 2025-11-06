@@ -115,33 +115,66 @@ const About = () => {
 
       {/* Contact Me Button */}
       {/* Desktop Button */}
-      <div className="hidden lg:flex flex-none justify-center items-center mt-14 z-10">
+      <div className="hidden lg:flex flex-none justify-center items-center mt-14 z-10 space-x-8">
+        {/* Contact Me Button */}
         <a
           href="#contact"
           className="relative inline-block xl:text-2xl lg:text-2xl font-extrabold uppercase text-white xl:px-14 xl:py-6 lg:px-10 lg:py-4 rounded-full
-               -translate-y-1 transition-all duration-500 ease-out border-[4px] border-transparent overflow-hidden
-               hover:-translate-x-[6px] hover:translate-y-[8px] hover:rotate-[-2deg]
-               hover:shadow-[12px_12px_40px_rgba(190,100,255,0.8)] hover:border-white"
+             -translate-y-1 transition-all duration-500 ease-out border-[4px] border-transparent overflow-hidden
+             hover:-translate-x-[6px] hover:translate-y-[8px] hover:rotate-[-2deg]
+             hover:shadow-[12px_12px_40px_rgba(190,100,255,0.8)] hover:border-white"
         >
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-pink-600 via-purple-600 to-orange-500"></span>
           <span className="absolute inset-0 rounded-full border-[2px] border-purple-300 pointer-events-none"></span>
           <span className="relative z-10 font-extrabold">Contact Me</span>
         </a>
+
+        {/* View Resume Button (opposite gradient) */}
+        <a
+          href="https://drive.google.com/file/d/13XVKIrolKCgkoNNQpibAfYAoYyP4EudW/view?usp=drive_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative inline-block xl:text-2xl lg:text-2xl font-extrabold uppercase text-white xl:px-14 xl:py-6 lg:px-10 lg:py-4 rounded-full
+             -translate-y-1 transition-all duration-500 ease-out border-[4px] border-transparent overflow-hidden
+             hover:-translate-x-[6px] hover:translate-y-[8px] hover:rotate-[2deg]
+             hover:shadow-[12px_12px_40px_rgba(255,150,100,0.8)] hover:border-white"
+        >
+          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 via-purple-600 via-pink-600 to-black"></span>
+          <span className="absolute inset-0 rounded-full border-[2px] border-orange-300 pointer-events-none"></span>
+          <span className="relative z-10 font-extrabold">View Resume</span>
+        </a>
       </div>
+
 
       {/* Mobile Button */}
       {/* Mobile Button */}
-      <div className="flex lg:hidden justify-center w-full mt-6 z-10">
+      <div className="flex lg:hidden justify-center items-center w-full mt-8 z-10 space-x-4">
+        {/* Contact Me Button */}
         <a
           href="#contact"
-          className="relative inline-block text-lg font-extrabold uppercase text-white px-8 py-3 rounded-full
-               -translate-y-1 transition-all duration-500 ease-out border-[4px] border-transparent overflow-hidden
-               hover:-translate-x-[6px] hover:translate-y-[8px] hover:rotate-[-2deg]
-               hover:shadow-[12px_12px_40px_rgba(190,100,255,0.8)] hover:border-white"
+          className="relative inline-block text-base font-extrabold uppercase text-white px-6 py-3 rounded-full
+             -translate-y-1 transition-all duration-500 ease-out border-[3px] border-transparent overflow-hidden
+             hover:-translate-x-[4px] hover:translate-y-[6px] hover:rotate-[-2deg]
+             hover:shadow-[8px_8px_25px_rgba(190,100,255,0.8)] hover:border-white"
         >
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-pink-600 via-purple-600 to-orange-500"></span>
           <span className="absolute inset-0 rounded-full border-[2px] border-purple-300 pointer-events-none"></span>
           <span className="relative z-10 font-extrabold">Contact Me</span>
+        </a>
+
+        {/* View Resume Button */}
+        <a
+          href="https://drive.google.com/file/d/13XVKIrolKCgkoNNQpibAfYAoYyP4EudW/view?usp=drive_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative inline-block text-base font-extrabold uppercase text-white px-6 py-3 rounded-full
+             -translate-y-1 transition-all duration-500 ease-out border-[3px] border-transparent overflow-hidden
+             hover:-translate-x-[4px] hover:translate-y-[6px] hover:rotate-[2deg]
+             hover:shadow-[8px_8px_25px_rgba(255,150,100,0.8)] hover:border-white"
+        >
+          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 via-purple-600 via-pink-600 to-black"></span>
+          <span className="absolute inset-0 rounded-full border-[2px] border-orange-300 pointer-events-none"></span>
+          <span className="relative z-10 font-extrabold">View Resume</span>
         </a>
       </div>
 
