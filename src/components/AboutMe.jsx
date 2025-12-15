@@ -131,7 +131,7 @@ const About = () => {
 
         {/* View Resume Button (opposite gradient) */}
         <a
-          href="https://drive.google.com/file/d/13XVKIrolKCgkoNNQpibAfYAoYyP4EudW/view?usp=drive_link"
+          href="https://drive.google.com/file/d/1wr5XXvB0QLwPFoHrozOY1ukkuxSqBQhY/view?usp=sharing"
           target="_blank"
           rel="noopener noreferrer"
           className="relative inline-block xl:text-2xl lg:text-2xl font-extrabold uppercase text-white xl:px-14 xl:py-6 lg:px-10 lg:py-4 rounded-full
