@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 
 const AnimatedImage = ({ imageRef, containerRef, handleMouseMove, handleMouseEnter, handleMouseLeave }) => {
   return (
@@ -21,15 +21,14 @@ const AnimatedImage = ({ imageRef, containerRef, handleMouseMove, handleMouseEnt
           relative left-[46%] item-center
           mt-[5%] mb-[-16%] sm:mt-[-7%] 
           w-[190%] sm:w-[155%] md:w-[116%] lg:w-[200%] xl:w-[147%]
-
           max-w-[90rem]
-          pointer-events-none 
-          transition-filter duration-300
+          pointer-events-none
         "
         style={{
           transform: "translate(-50%, 0)",
           filter:
             "drop-shadow(0 0 10px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3))",
+          willChange: "transform, filter", // <-- GPU optimization
         }}
       />
     </div>

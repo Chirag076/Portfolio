@@ -2,18 +2,29 @@ import React from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  const links = [
+    { id: "about", label: "About" },
+    { id: "customers", label: "Customers" },
+    { id: "projects", label: "Projects" },
+    { id: "contact", label: "Contact" },
+  ];
   return (
     <nav className="flex justify-between items-center px-6 sm:px-8 py-3 sm:py-2 relative z-3">
       {/* Logo */}
       <div>
-        <a href="#">
-
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <img
             src="./logo2.png"
             alt="Logo"
             className="h-16 sm:h-14 md:h-16 lg:h-24 w-auto transition-all duration-300"
           />
-        </a>
+        </button>
       </div>
 
       {/* Desktop Nav */}
@@ -25,10 +36,15 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
           font-extrabold tracking-wider
         "
       >
-        <a href="#about" className="hover:text-blue-400 transition">About</a>
-        <a href="#customers" className="hover:text-blue-400 transition">Customers</a>
-        <a href="#projects" className="hover:text-blue-400 transition">Projects</a>
-        <a href="#contact" className="hover:text-blue-400 transition">Contact</a>
+        {links.map(link => (
+          <button
+            key={link.id}
+            onClick={() => scrollToSection(link.id)}
+            className="hover:text-blue-400 transition"
+          >
+            {link.label}
+          </button>
+        ))}
       </div>
 
       {/* Mobile Menu Icon */}
@@ -54,14 +70,19 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
             md:hidden z-50
           "
         >
-          <a href="#about" onClick={closeMenu} className="hover:text-blue-400 transition">About</a>
-          <a href="#customers" onClick={closeMenu} className="hover:text-blue-400 transition">Customers</a>
-          <a href="#projects" onClick={closeMenu} className="hover:text-blue-400 transition">Projects</a>
-          <a href="#contact" onClick={closeMenu} className="hover:text-blue-400 transition">Contact</a>
+          {links.map(link => (
+            <button
+              key={link.id}
+              onClick={() => { scrollToSection(link.id); closeMenu(); }}
+              className="hover:text-blue-400 transition"
+            >
+              {link.label}
+            </button>
+          ))}
         </div>
       )}
     </nav>
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);
