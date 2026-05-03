@@ -9,16 +9,42 @@ const AdminDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
 
+  const [saveStatus, setSaveStatus] = useState("");
+
+  // INACTIVITY TIMER (5 Minutes)
   useEffect(() => {
+    let timeout;
+    
+    const resetTimer = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        handleLogout();
+        alert("Logged out due to inactivity 🔒");
+      }, 5 * 60 * 1000); // 5 Minutes
+    };
+
     const auth = localStorage.getItem("admin-auth");
     if (!auth) {
       window.location.href = "/admin";
+    } else {
+      resetTimer();
+      window.addEventListener("mousemove", resetTimer);
+      window.addEventListener("keydown", resetTimer);
+      window.addEventListener("click", resetTimer);
     }
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+      window.removeEventListener("click", resetTimer);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("admin-auth");
-    window.location.href = "/";
+    localStorage.removeItem("admin-password");
+    window.location.href = "/admin";
   };
 
   const handleProjectChange = (id, field, value) => {
@@ -95,9 +121,19 @@ const AdminDashboard = () => {
           >
             <Trash2 size={18} />
           </button>
-          <input className="w-full bg-transparent text-2xl font-bold text-pink-400 mb-2 outline-none border-b border-pink-500/50 focus:border-pink-500" value={p.title} onChange={(e) => handleProjectChange(p.id, "title", e.target.value)} />
-          <textarea className="w-full bg-transparent text-gray-300 mt-2 outline-none border-b border-white/20 focus:border-white h-24" value={p.description} onChange={(e) => handleProjectChange(p.id, "description", e.target.value)} />
-          <input className="w-full bg-transparent text-gray-400 mt-2 outline-none border-b border-white/20 focus:border-white" value={p.link} onChange={(e) => handleProjectChange(p.id, "link", e.target.value)} />
+          <input className="w-full bg-transparent text-2xl font-bold text-pink-400 mb-2 outline-none border-b border-pink-500/50 focus:border-pink-500" placeholder="Project Title" value={p.title} onChange={(e) => handleProjectChange(p.id, "title", e.target.value)} />
+          <textarea className="w-full bg-transparent text-gray-300 mt-2 outline-none border-b border-white/20 focus:border-white h-20" placeholder="Description" value={p.description} onChange={(e) => handleProjectChange(p.id, "description", e.target.value)} />
+          
+          <div className="flex flex-col md:flex-row gap-4 mt-2">
+            <div className="flex-1">
+              <label className="text-[10px] text-gray-500 uppercase font-bold">Image Path</label>
+              <input className="w-full bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white text-sm" value={p.image} onChange={(e) => handleProjectChange(p.id, "image", e.target.value)} />
+            </div>
+            <div className="flex-1">
+              <label className="text-[10px] text-gray-500 uppercase font-bold">Project Link</label>
+              <input className="w-full bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white text-sm" value={p.link} onChange={(e) => handleProjectChange(p.id, "link", e.target.value)} />
+            </div>
+          </div>
         </div>
       ))}
       <button 
@@ -144,12 +180,31 @@ const AdminDashboard = () => {
           >
             <Trash2 size={18} />
           </button>
-          <input className="w-full bg-transparent text-2xl font-bold text-orange-400 mb-2 outline-none border-b border-orange-500/50 focus:border-orange-500" value={e.role} onChange={(evt) => handleExperienceChange(e.id, "role", evt.target.value)} />
+          <input className="w-full bg-transparent text-2xl font-bold text-orange-400 mb-2 outline-none border-b border-orange-500/50 focus:border-orange-500" placeholder="Role Name" value={e.role} onChange={(evt) => handleExperienceChange(e.id, "role", evt.target.value)} />
           <div className="flex gap-4">
-            <input className="w-1/2 bg-transparent text-white font-bold outline-none border-b border-white/20 focus:border-white" value={e.company} onChange={(evt) => handleExperienceChange(e.id, "company", evt.target.value)} />
-            <input className="w-1/2 bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white" value={e.duration} onChange={(evt) => handleExperienceChange(e.id, "duration", evt.target.value)} />
+            <input className="w-1/2 bg-transparent text-white font-bold outline-none border-b border-white/20 focus:border-white" placeholder="Company" value={e.company} onChange={(evt) => handleExperienceChange(e.id, "company", evt.target.value)} />
+            <input className="w-1/2 bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white" placeholder="Duration" value={e.duration} onChange={(evt) => handleExperienceChange(e.id, "duration", evt.target.value)} />
           </div>
-          <textarea className="w-full bg-transparent text-gray-300 mt-4 outline-none border-b border-white/20 focus:border-white h-24" value={e.description} onChange={(evt) => handleExperienceChange(e.id, "description", evt.target.value)} />
+          <textarea className="w-full bg-transparent text-gray-300 mt-4 outline-none border-b border-white/20 focus:border-white h-20" placeholder="Job Description" value={e.description} onChange={(evt) => handleExperienceChange(e.id, "description", evt.target.value)} />
+          
+          <div className="flex flex-col md:flex-row gap-4 mt-4">
+            <div className="flex-1">
+              <label className="text-[10px] text-gray-500 uppercase font-bold">Tech Stack (comma separated)</label>
+              <input 
+                className="w-full bg-transparent text-blue-400 outline-none border-b border-white/20 focus:border-white text-sm" 
+                value={e.tech.join(", ")} 
+                onChange={(evt) => handleExperienceChange(e.id, "tech", evt.target.value.split(",").map(t => t.trim()))} 
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-[10px] text-gray-500 uppercase font-bold">Glow Gradient (Tailwind Class)</label>
+              <input 
+                className="w-full bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white text-sm" 
+                value={e.glow} 
+                onChange={(evt) => handleExperienceChange(e.id, "glow", evt.target.value)} 
+              />
+            </div>
+          </div>
         </div>
       ))}
       <button 
