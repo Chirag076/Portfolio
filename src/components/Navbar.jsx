@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Magnetic from "./Magnetic";
 import LocalTime from "./LocalTime";
 import { usePortfolio } from "../context/PortfolioContext";
