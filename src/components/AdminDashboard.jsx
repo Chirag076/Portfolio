@@ -181,10 +181,10 @@ const AdminDashboard = () => {
         setSaveStatus("Changes saved live! 🚀");
         setTimeout(() => setSaveStatus(""), 3000);
       } else {
-        setSaveStatus("Error: " + data.error);
+        setSaveStatus("Error: " + (data.details || data.error));
       }
     } catch (err) {
-      setSaveStatus("Network error ❌");
+      setSaveStatus("Network error ❌ Check your connection.");
     } finally {
       setIsSaving(false);
     }

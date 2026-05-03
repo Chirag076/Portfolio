@@ -1,27 +1,45 @@
 const { MongoClient } = require('mongodb');
 
+// Create the client outside the handler for connection pooling
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+let client;
+let clientPromise;
+
+if (!uri) {
+  console.error("MONGODB_URI is missing from environment variables!");
+} else {
+  client = new MongoClient(uri);
+  clientPromise = client.connect();
+}
 
 module.exports = async (req, res) => {
+  // 1. Check if URI exists
+  if (!uri) {
+    return res.status(500).json({ error: "Configuration Error: MONGODB_URI is missing." });
+  }
+
   try {
-    await client.connect();
-    const db = client.db('portfolio_db');
+    const connectedClient = await clientPromise;
+    const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
 
     // GET: Load all portfolio data
     if (req.method === 'GET') {
       const data = await collection.findOne({ _id: 'main_content' });
-      return res.status(200).json(data || {});
+      // Return defaults if DB is empty
+      return res.status(200).json(data || { projects: [], services: [], experience: [] });
     }
 
-    // POST: Update all portfolio data (Secure)
+    // POST: Update all portfolio data
     if (req.method === 'POST') {
       const { password, content } = req.body;
       
-      // Simple server-side password check
-      if (password !== process.env.ADMIN_PASSWORD) {
-        return res.status(401).json({ error: 'Unauthorized' });
+      if (!password || password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid Password' });
+      }
+
+      if (!content) {
+        return res.status(400).json({ error: 'Bad Request: No content provided' });
       }
 
       await collection.updateOne(
@@ -35,7 +53,11 @@ module.exports = async (req, res) => {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Server Error' });
+    console.error("API Error:", error);
+    // Return the actual error message to the frontend for debugging
+    return res.status(500).json({ 
+      error: "Database Connection Error", 
+      details: error.message 
+    });
   }
 };
