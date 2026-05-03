@@ -1,9 +1,9 @@
 import React, { memo } from "react";
+import { motion } from "framer-motion";
 import AnimatedImage from "./AnimatedImage";
 import BlurText from "./BlurText";
 import Magnetic from "./Magnetic";
 import CanvasParticles from "./CanvasParticles";
-import ScrambleText from "./ScrambleText";
 import { usePortfolio } from "../context/PortfolioContext";
 
 // Memoized to prevent unnecessary re-renders
@@ -14,9 +14,14 @@ const Hero = memo(() => {
       <CanvasParticles />
       {/* Heading */}
       <div className="z-10 mt-20 md:mt-0">
-        <h1 className="text-[15vw] sm:text-[11vw] md:text-[11vw] lg:text-[11vw] xl:text-[12vw] leading-none font-extrabold z-0">
-          <ScrambleText text="HI, I'M CHIRAG" />
-        </h1>
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-[15vw] sm:text-[11vw] md:text-[11vw] lg:text-[11vw] xl:text-[12vw] leading-none font-extrabold z-0"
+        >
+          HI, I'M CHIRAG
+        </motion.h1>
       </div>
 
       {/* Responsive Layout */}
