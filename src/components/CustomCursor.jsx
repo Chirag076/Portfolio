@@ -9,7 +9,7 @@ const CustomCursor = () => {
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    
+
     const handleMouseMove = (e) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -52,7 +52,7 @@ const CustomCursor = () => {
 
   return (
     <motion.div
-      className="fixed inset-0 pointer-events-none z-[9999999]"
+      className="fixed inset-0 pointer-events-none z-[99999999]"
       style={{ opacity: 1 }}
     >
       {/* Outer Ring / Trail */}

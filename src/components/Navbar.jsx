@@ -3,13 +3,13 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import Magnetic from "./Magnetic";
 import LocalTime from "./LocalTime";
-import SecretsGuide from "./SecretsGuide";
+import { usePortfolio } from "../context/PortfolioContext";
 
 const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [atTop, setAtTop] = useState(true);
-  const [showSecrets, setShowSecrets] = useState(false);
+  const { setShowSecrets } = usePortfolio();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious();
@@ -50,9 +50,8 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
       }}
       animate={hidden ? "hidden" : "visible"}
       transition={{ duration: 0.35, ease: "easeInOut" }}
-      className={`fixed top-0 left-0 right-0 flex justify-between items-center px-6 sm:px-8 py-3 sm:py-2 z-[90] transition-colors duration-300 ${
-        atTop ? "bg-transparent" : "bg-black/40 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-white/10"
-      }`}
+      className={`fixed top-0 left-0 right-0 flex justify-between items-center px-6 sm:px-8 py-3 sm:py-2 z-[90] transition-colors duration-300 ${atTop ? "bg-transparent" : "bg-black/40 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-white/10"
+        }`}
     >
       {/* Logo */}
       <Magnetic intensity={0.1}>
@@ -130,10 +129,6 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
         </div>
       )}
 
-      {/* Secrets Modal */}
-      <AnimatePresence>
-        {showSecrets && <SecretsGuide onClose={() => setShowSecrets(false)} />}
-      </AnimatePresence>
     </motion.nav>
   );
 };

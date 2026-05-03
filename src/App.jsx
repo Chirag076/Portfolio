@@ -11,16 +11,18 @@ import Preloader from "./components/Preloader";
 import ContextMenu from "./components/ContextMenu";
 import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
-import { PortfolioProvider } from "./context/PortfolioContext";
+import SecretsGuide from "./components/SecretsGuide";
+import { usePortfolio } from "./context/PortfolioContext";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 const App = () => {
   const [showSnakeGame, setShowSnakeGame] = useState(false);
+  const { showSecrets, setShowSecrets } = usePortfolio();
 
   useEffect(() => {
     let originalTitle = document.title;
-    
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         document.title = "👀 Come back soon!";
@@ -78,14 +80,18 @@ const App = () => {
   const location = useLocation();
 
   return (
-    <PortfolioProvider>
-      <SmoothScroll>
-        <Preloader />
-        <CustomCursor />
-        <ContextMenu />
-        <SoundEngine />
+    <SmoothScroll>
+      <Preloader />
+      <ContextMenu />
+      <SoundEngine />
+      
+      <AnimatePresence>
         {showSnakeGame && <SnakeGame onClose={() => setShowSnakeGame(false)} />}
-        
+        {showSecrets && <SecretsGuide onClose={() => setShowSecrets(false)} />}
+      </AnimatePresence>
+      
+      <CustomCursor />
+
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route
@@ -109,7 +115,7 @@ const App = () => {
                 </motion.div>
               }
             />
-            
+
             <Route
               path="/admin"
               element={
@@ -125,7 +131,7 @@ const App = () => {
                 </motion.div>
               }
             />
-            
+
             <Route
               path="/admin/dashboard"
               element={
@@ -145,8 +151,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
-      </SmoothScroll>
-    </PortfolioProvider>
+    </SmoothScroll>
   );
 };
 export default App;

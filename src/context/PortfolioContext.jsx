@@ -76,12 +76,15 @@ export const PortfolioProvider = ({ children }) => {
     fetchData();
   }, []);
 
+  const [showSecrets, setShowSecrets] = useState(false);
+
   return (
     <PortfolioContext.Provider value={{
       projects, setProjects,
       services, setServices,
       experience, setExperience,
-      isLoading
+      isLoading,
+      showSecrets, setShowSecrets
     }}>
       {children}
     </PortfolioContext.Provider>

@@ -29,11 +29,11 @@ const SnakeGame = ({ onClose }) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      switch(e.key) {
-        case 'ArrowUp': if(direction[1] !== 1) setDirection([0, -1]); break;
-        case 'ArrowDown': if(direction[1] !== -1) setDirection([0, 1]); break;
-        case 'ArrowLeft': if(direction[0] !== 1) setDirection([-1, 0]); break;
-        case 'ArrowRight': if(direction[0] !== -1) setDirection([1, 0]); break;
+      switch (e.key) {
+        case 'ArrowUp': if (direction[1] !== 1) setDirection([0, -1]); break;
+        case 'ArrowDown': if (direction[1] !== -1) setDirection([0, 1]); break;
+        case 'ArrowLeft': if (direction[0] !== 1) setDirection([-1, 0]); break;
+        case 'ArrowRight': if (direction[0] !== -1) setDirection([1, 0]); break;
         default: break;
       }
     };
@@ -76,18 +76,18 @@ const SnakeGame = ({ onClose }) => {
     };
 
     const speed = Math.max(50, 150 - score); // Gets faster
-    const gameInterval = setInterval(moveSnake, speed); 
+    const gameInterval = setInterval(moveSnake, speed);
     return () => clearInterval(gameInterval);
   }, [direction, food, gameOver, score, generateFood]);
 
   return (
     <div className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center font-mono">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="relative bg-gray-900 border-4 border-pink-500 rounded-xl p-8 shadow-[0_0_50px_rgba(236,72,153,0.5)] flex flex-col items-center"
       >
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl font-bold"
         >
@@ -97,10 +97,10 @@ const SnakeGame = ({ onClose }) => {
         <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-4 tracking-widest uppercase">
           Secret Level
         </h2>
-        
+
         <div className="text-xl text-white mb-6">Score: <span className="text-pink-400">{score}</span></div>
 
-        <div 
+        <div
           className="grid bg-black border border-white/10"
           style={{
             gridTemplateColumns: `repeat(${GRID_SIZE}, 20px)`,
@@ -115,14 +115,13 @@ const SnakeGame = ({ onClose }) => {
             const isHead = snake[0][0] === x && snake[0][1] === y;
 
             return (
-              <div 
-                key={i} 
-                className={`w-[20px] h-[20px] ${
-                  isHead ? 'bg-pink-400 rounded-sm' :
-                  isSnake ? 'bg-purple-500 rounded-sm opacity-80' : 
-                  isFood ? 'bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_#4ade80]' : 
-                  ''
-                }`}
+              <div
+                key={i}
+                className={`w-[20px] h-[20px] ${isHead ? 'bg-pink-400 rounded-sm' :
+                    isSnake ? 'bg-purple-500 rounded-sm opacity-80' :
+                      isFood ? 'bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_#4ade80]' :
+                        ''
+                  }`}
               />
             );
           })}
@@ -133,7 +132,7 @@ const SnakeGame = ({ onClose }) => {
             <h3 className="text-4xl font-bold text-red-500 mb-4 animate-bounce">GAME OVER</h3>
             <div className="flex gap-4">
               <Magnetic intensity={0.2}>
-                <button 
+                <button
                   onClick={() => {
                     setSnake(INITIAL_SNAKE);
                     setDirection(INITIAL_DIRECTION);
@@ -147,7 +146,7 @@ const SnakeGame = ({ onClose }) => {
                 </button>
               </Magnetic>
               <Magnetic intensity={0.2}>
-                <button 
+                <button
                   onClick={onClose}
                   className="px-6 py-2 bg-transparent border-2 border-pink-500 text-pink-500 font-bold rounded hover:bg-pink-500 hover:text-white transition"
                 >

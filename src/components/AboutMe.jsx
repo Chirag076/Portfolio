@@ -6,13 +6,13 @@ import ScrambleText from "./ScrambleText";
 const About = () => {
   const [text, setText] = useState("");
   const fullText = "I'm a full-stack developer passionate about crafting fast, accessible, and visually clean web and app experiences. \n\nI build seamless digital experiences, architect robust backends, and optimize cloud deployments. Always learning, always building.";
-  
+
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   useEffect(() => {
     if (!isInView) return;
-    
+
     let i = 0;
     const typingInterval = setInterval(() => {
       if (i < fullText.length - 1) {
@@ -59,14 +59,14 @@ const About = () => {
           <ScrambleText text="ABOUT" delay={400} />
         </motion.h1>
       </div>
-      
+
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-500/10 blur-[150px] rounded-full pointer-events-none"></div>
 
       <div className="max-w-4xl w-full relative z-10" ref={ref}>
-        
+
         {/* Fake Terminal Window */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.4 }}
@@ -89,16 +89,16 @@ const About = () => {
             <div className="text-green-400 mb-4">$ cat bio.txt</div>
             <div className="text-gray-300 leading-relaxed whitespace-pre-line min-h-[140px] md:min-h-[100px]">
               {text}
-              <motion.span 
-                animate={{ opacity: [1, 0] }} 
+              <motion.span
+                animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
                 className="inline-block w-2.5 h-5 bg-green-500 ml-1 align-middle"
               ></motion.span>
             </div>
 
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: text.length > 50 ? 1 : 0 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: text.length > 50 ? 1 : 0 }}
               transition={{ duration: 0.5 }}
             >
               <div className="text-green-400 mt-8 mb-4">$ fetch stats --user=Chirag076</div>

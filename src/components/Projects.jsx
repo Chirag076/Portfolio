@@ -63,7 +63,7 @@ const ProjectCard = ({ project, index }) => {
         <motion.img
           src={project.image}
           alt={project.title}
-          style={{ 
+          style={{
             transform: "translateZ(30px)",
             y: imageY,
             scale: 1.1
@@ -76,7 +76,7 @@ const ProjectCard = ({ project, index }) => {
       </div>
 
       {/* Project Content */}
-      <motion.div 
+      <motion.div
         style={{ transform: "translateZ(40px)" }} // Pops out slightly more
         className="md:w-2/3 text-left mt-4 md:mt-0"
       >
