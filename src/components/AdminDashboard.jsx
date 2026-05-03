@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePortfolio } from "../context/PortfolioContext";
 import { Save, Loader2, Plus, Trash2 } from "lucide-react";
 
@@ -90,9 +90,10 @@ const AdminDashboard = () => {
         <div key={p.id} className="p-6 bg-white/10 rounded-2xl border border-white/20 relative group">
           <button 
             onClick={() => handleDeleteProject(p.id)}
-            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all font-bold"
+            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all p-2 bg-black/20 rounded-lg"
+            title="Remove Project"
           >
-            REMOVE
+            <Trash2 size={18} />
           </button>
           <input className="w-full bg-transparent text-2xl font-bold text-pink-400 mb-2 outline-none border-b border-pink-500/50 focus:border-pink-500" value={p.title} onChange={(e) => handleProjectChange(p.id, "title", e.target.value)} />
           <textarea className="w-full bg-transparent text-gray-300 mt-2 outline-none border-b border-white/20 focus:border-white h-24" value={p.description} onChange={(e) => handleProjectChange(p.id, "description", e.target.value)} />
@@ -101,9 +102,9 @@ const AdminDashboard = () => {
       ))}
       <button 
         onClick={handleAddProject}
-        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-pink-500 hover:text-pink-500 transition-all font-bold"
+        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-pink-500 hover:text-pink-500 transition-all font-bold flex items-center justify-center gap-2"
       >
-        + ADD NEW PROJECT
+        <Plus size={20} /> ADD NEW PROJECT
       </button>
     </div>
   );
@@ -114,9 +115,10 @@ const AdminDashboard = () => {
         <div key={s.id} className="p-6 bg-white/10 rounded-2xl border border-white/20 relative group">
           <button 
             onClick={() => handleDeleteService(s.id)}
-            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all font-bold"
+            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all p-2 bg-black/20 rounded-lg"
+            title="Remove Service"
           >
-            REMOVE
+            <Trash2 size={18} />
           </button>
           <input className="w-full bg-transparent text-2xl font-bold text-purple-400 mb-2 outline-none border-b border-purple-500/50 focus:border-purple-500" value={s.title} onChange={(e) => handleServiceChange(s.id, "title", e.target.value)} />
           <textarea className="w-full bg-transparent text-gray-300 mt-2 outline-none border-b border-white/20 focus:border-white h-24" value={s.description} onChange={(e) => handleServiceChange(s.id, "description", e.target.value)} />
@@ -124,9 +126,9 @@ const AdminDashboard = () => {
       ))}
       <button 
         onClick={handleAddService}
-        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-purple-500 hover:text-purple-500 transition-all font-bold"
+        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-purple-500 hover:text-purple-500 transition-all font-bold flex items-center justify-center gap-2"
       >
-        + ADD NEW SERVICE
+        <Plus size={20} /> ADD NEW SERVICE
       </button>
     </div>
   );
@@ -137,9 +139,10 @@ const AdminDashboard = () => {
         <div key={e.id} className="p-6 bg-white/10 rounded-2xl border border-white/20 relative group">
           <button 
             onClick={() => handleDeleteExperience(e.id)}
-            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all font-bold"
+            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 transition-all p-2 bg-black/20 rounded-lg"
+            title="Remove Experience"
           >
-            REMOVE
+            <Trash2 size={18} />
           </button>
           <input className="w-full bg-transparent text-2xl font-bold text-orange-400 mb-2 outline-none border-b border-orange-500/50 focus:border-orange-500" value={e.role} onChange={(evt) => handleExperienceChange(e.id, "role", evt.target.value)} />
           <div className="flex gap-4">
@@ -151,9 +154,9 @@ const AdminDashboard = () => {
       ))}
       <button 
         onClick={handleAddExperience}
-        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-all font-bold"
+        className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-all font-bold flex items-center justify-center gap-2"
       >
-        + ADD NEW EXPERIENCE
+        <Plus size={20} /> ADD NEW EXPERIENCE
       </button>
     </div>
   );
