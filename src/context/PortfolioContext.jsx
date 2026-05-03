@@ -37,6 +37,15 @@ const defaultExperience = [
     description: "Fixed bugs and implemented new APIs and features, ensuring smooth functionality and system reliability. Focused on deployment efficiency, code quality, and optimizing performance across applications.",
     tech: ["React", "TypeScript", "TailwindCSS", "Node.js", "MongoDB"],
     glow: "from-pink-500 via-purple-500 to-orange-400",
+  },
+  {
+    id: 2,
+    role: "Software Developer intern",
+    company: "OPM Corporation",
+    duration: "Jul 2025 – Oct 2025",
+    description: "Built responsive and interactive user interfaces using React, TypeScript, and TailwindCSS. Focused on performance, accessibility, and delivering a consistent user experience across web platforms.",
+    tech: ["React", "TypeScript", "TailwindCSS", "Node.js", "MongoDB"],
+    glow: "from-orange-400 via-yellow-400 to-pink-500",
   }
 ];
 
