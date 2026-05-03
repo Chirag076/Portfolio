@@ -77,6 +77,7 @@ export const PortfolioProvider = ({ children }) => {
   }, []);
 
   const [showSecrets, setShowSecrets] = useState(false);
+  const [showResume, setShowResume] = useState(false);
 
   return (
     <PortfolioContext.Provider value={{
@@ -84,7 +85,8 @@ export const PortfolioProvider = ({ children }) => {
       services, setServices,
       experience, setExperience,
       isLoading,
-      showSecrets, setShowSecrets
+      showSecrets, setShowSecrets,
+      showResume, setShowResume
     }}>
       {children}
     </PortfolioContext.Provider>

@@ -4,9 +4,11 @@ import BlurText from "./BlurText";
 import Magnetic from "./Magnetic";
 import CanvasParticles from "./CanvasParticles";
 import ScrambleText from "./ScrambleText";
+import { usePortfolio } from "../context/PortfolioContext";
 
 // Memoized to prevent unnecessary re-renders
 const Hero = memo(() => {
+  const { setShowResume } = usePortfolio();
   return (
     <section className="relative px-6 pt-0 pb-24 text-center flex flex-col items-center justify-start overflow-hidden w-full bg-black min-h-screen">
       <CanvasParticles />
@@ -47,9 +49,9 @@ const Hero = memo(() => {
             />
           </div>
 
-          {/* Right - Button */}
-          {/* Desktop Button */}
-          <div className="hidden lg:flex flex-none justify-center items-center xl:-translate-y-24 xl:-translate-x-24 lg:-translate-y-14 lg:-translate-x-12">
+          {/* Right - Buttons */}
+          {/* Desktop Buttons */}
+          <div className="hidden lg:flex flex-none flex-col gap-4 justify-center items-center xl:-translate-y-24 xl:-translate-x-24 lg:-translate-y-14 lg:-translate-x-12">
             <Magnetic intensity={0.2}>
               <a
                 href="#contact"
@@ -63,10 +65,21 @@ const Hero = memo(() => {
                 <span className="relative z-10 font-extrabold">Contact Me</span>
               </a>
             </Magnetic>
+
+              <Magnetic intensity={0.2}>
+                <button
+                  onClick={() => setShowResume(true)}
+                  className="relative inline-block xl:text-xl lg:text-lg font-bold uppercase text-white xl:px-10 xl:py-4 lg:px-8 lg:py-3 rounded-full
+                         border-2 border-white/20 overflow-hidden transition-all duration-300
+                         hover:bg-white hover:text-black hover:border-white shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                >
+                  <span className="relative z-10">View Resume</span>
+                </button>
+              </Magnetic>
           </div>
 
-          {/* Mobile Button */}
-          <div className="flex lg:hidden justify-center w-full mt-6">
+          {/* Mobile Buttons */}
+          <div className="flex lg:hidden flex-col gap-4 justify-center w-full mt-6">
             <Magnetic intensity={0.2}>
               <a
                 href="#contact"
@@ -79,6 +92,16 @@ const Hero = memo(() => {
                 <span className="absolute inset-0 rounded-full border-[2px] border-purple-300 pointer-events-none"></span>
                 <span className="relative z-10 font-extrabold">Contact Me</span>
               </a>
+            </Magnetic>
+
+            <Magnetic intensity={0.2}>
+              <button
+                onClick={() => setShowResume(true)}
+                className="relative inline-block text-base font-bold uppercase text-white px-6 py-2.5 rounded-full
+                 border border-white/30 transition-all duration-300 hover:bg-white hover:text-black"
+              >
+                <span className="relative z-10">View Resume</span>
+              </button>
             </Magnetic>
           </div>
         </div>

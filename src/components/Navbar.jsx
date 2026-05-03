@@ -9,7 +9,7 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [atTop, setAtTop] = useState(true);
-  const { setShowSecrets } = usePortfolio();
+  const { setShowSecrets, setShowResume } = usePortfolio();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious();
@@ -22,9 +22,18 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
     setAtTop(latest < 50);
   });
 
-  const handleNavClick = (e, id) => {
+  const handleNavClick = (e, link) => {
+    if (link.id === "resume") {
+      e.preventDefault();
+      setShowResume(true);
+      if (closeMenu) closeMenu();
+      return;
+    }
+    
+    if (link.external) return; // Let default anchor behavior handle it
+    
     e.preventDefault();
-    const section = document.getElementById(id);
+    const section = document.getElementById(link.id);
     if (section) {
       const top = section.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
@@ -40,6 +49,7 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
     { id: "services", label: "Services" },
     { id: "projects", label: "Projects" },
     { id: "contact", label: "Contact" },
+    { id: "resume", label: "Resume" },
   ];
 
   return (
@@ -69,9 +79,11 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
         {links.map(link => (
           <Magnetic intensity={0.2} key={link.id}>
             <a
-              href={`#${link.id}`}
+              href={link.external ? link.url : `#${link.id}`}
+              target={link.external ? "_blank" : "_self"}
+              rel={link.external ? "noopener noreferrer" : ""}
               className="hover:text-white transition-colors cursor-pointer relative group"
-              onClick={(e) => handleNavClick(e, link.id)}
+              onClick={(e) => handleNavClick(e, link)}
             >
               {link.label}
               <span className="absolute -bottom-1.5 left-0 w-0 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
@@ -118,8 +130,10 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
           {links.map(link => (
             <a
               key={link.id}
-              href={`#${link.id}`}
-              onClick={(e) => handleNavClick(e, link.id)}
+              href={link.external ? link.url : `#${link.id}`}
+              target={link.external ? "_blank" : "_self"}
+              rel={link.external ? "noopener noreferrer" : ""}
+              onClick={(e) => handleNavClick(e, link)}
               className="hover:text-blue-400 transition cursor-pointer"
             >
               {link.label}

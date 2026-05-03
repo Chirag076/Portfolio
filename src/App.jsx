@@ -12,13 +12,14 @@ import ContextMenu from "./components/ContextMenu";
 import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
 import SecretsGuide from "./components/SecretsGuide";
+import ResumeViewer from "./components/ResumeViewer";
 import { usePortfolio } from "./context/PortfolioContext";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 const App = () => {
   const [showSnakeGame, setShowSnakeGame] = useState(false);
-  const { showSecrets, setShowSecrets } = usePortfolio();
+  const { showSecrets, setShowSecrets, showResume, setShowResume } = usePortfolio();
 
   useEffect(() => {
     let originalTitle = document.title;
@@ -88,6 +89,7 @@ const App = () => {
       <AnimatePresence>
         {showSnakeGame && <SnakeGame onClose={() => setShowSnakeGame(false)} />}
         {showSecrets && <SecretsGuide onClose={() => setShowSecrets(false)} />}
+        {showResume && <ResumeViewer onClose={() => setShowResume(false)} />}
       </AnimatePresence>
       
       <CustomCursor />
