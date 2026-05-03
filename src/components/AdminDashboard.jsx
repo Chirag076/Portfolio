@@ -9,8 +9,6 @@ const AdminDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
 
-  const [saveStatus, setSaveStatus] = useState("");
-
   // INACTIVITY TIMER (5 Minutes)
   useEffect(() => {
     let timeout;
