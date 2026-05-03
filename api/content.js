@@ -26,8 +26,8 @@ module.exports = async (req, res) => {
     // GET: Load all portfolio data
     if (req.method === 'GET') {
       const data = await collection.findOne({ _id: 'main_content' });
-      // Return defaults if DB is empty
-      return res.status(200).json(data || { projects: [], services: [], experience: [] });
+      // Return empty object so frontend keeps its local defaults if DB is empty
+      return res.status(200).json(data || {});
     }
 
     // POST: Update all portfolio data
