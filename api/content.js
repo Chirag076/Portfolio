@@ -1,5 +1,5 @@
-const { MongoClient } = require('mongodb');
-const { authenticator } = require('otplib');
+import { MongoClient } from 'mongodb';
+import { authenticator } from 'otplib';
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -14,7 +14,7 @@ async function connectToDatabase() {
   return client;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
@@ -22,17 +22,14 @@ module.exports = async (req, res) => {
 
     // GET: Load all portfolio data + Increment visitor count
     if (req.method === 'GET') {
-      // Increment visitor count on every main site load
       const updateResult = await collection.findOneAndUpdate(
         { _id: 'main_content' },
         { $inc: { visitorCount: 1 } },
         { upsert: true, returnDocument: 'after' }
       );
       
-      // Handle different MongoDB driver return structures
       const data = updateResult.value || updateResult;
       
-      // Security: Remove sensitive data before sending to client
       if (data) {
         if (data.adminPassword) delete data.adminPassword;
         if (data.twoFactorSecret) {
@@ -48,7 +45,6 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
       const { password, content, twoFactorCode } = req.body;
       
-      // Check password against DB override first, then env
       const currentConfig = await collection.findOne({ _id: 'main_content' });
       const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
 
@@ -56,7 +52,6 @@ module.exports = async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized: Invalid Password' });
       }
 
-      // 2FA CHECK
       if (currentConfig?.twoFactorSecret) {
         if (!twoFactorCode) {
           return res.status(401).json({ error: '2FA Code Required', requires2FA: true });
@@ -67,7 +62,6 @@ module.exports = async (req, res) => {
         }
       }
 
-      // If just checking password/2FA (empty content)
       if (content && Object.keys(content).length > 0) {
         await collection.updateOne(
           { _id: 'main_content' },
@@ -87,4 +81,4 @@ module.exports = async (req, res) => {
       details: error.message 
     });
   }
-};
+}

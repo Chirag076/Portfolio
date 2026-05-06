@@ -1,4 +1,4 @@
-const { MongoClient, ObjectId } = require('mongodb');
+import { MongoClient, ObjectId } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -13,17 +13,15 @@ async function connectToDatabase() {
   return client;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const messagesCollection = db.collection('messages');
     const contentCollection = db.collection('content');
 
-    // POST: Save a new message (Public)
     if (req.method === 'POST') {
       const { name, email, message } = req.body;
-      
       if (!name || !email || !message) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
@@ -40,7 +38,6 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true });
     }
 
-    // AUTH CHECK for GET and DELETE
     const { password } = req.headers;
     const currentConfig = await contentCollection.findOne({ _id: 'main_content' });
     const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
@@ -49,13 +46,11 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // GET: Fetch all messages (Admin Only)
     if (req.method === 'GET') {
       const messages = await messagesCollection.find({}).sort({ createdAt: -1 }).toArray();
       return res.status(200).json(messages);
     }
 
-    // DELETE: Remove a message (Admin Only)
     if (req.method === 'DELETE') {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: 'Missing message ID' });
@@ -69,4 +64,4 @@ module.exports = async (req, res) => {
     console.error("Messages API Error:", error);
     return res.status(500).json({ error: "Database Error", details: error.message });
   }
-};
+}

@@ -1,6 +1,6 @@
-const { MongoClient } = require('mongodb');
-const { authenticator } = require('otplib');
-const QRCode = require('qrcode');
+import { MongoClient } from 'mongodb';
+import { authenticator } from 'otplib';
+import QRCode from 'qrcode';
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -15,7 +15,7 @@ async function connectToDatabase() {
   return client;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
@@ -29,7 +29,6 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // GET: Generate Setup Data
     if (req.method === 'GET') {
       const secret = authenticator.generateSecret();
       const otpauth = authenticator.keyuri('Admin', 'Portfolio', secret);
@@ -38,10 +37,8 @@ module.exports = async (req, res) => {
       return res.status(200).json({ secret, qrCodeUrl });
     }
 
-    // POST: Enable 2FA (Verify and Save)
     if (req.method === 'POST') {
       const { secret, code } = req.body;
-      
       const isValid = authenticator.check(code, secret);
       if (!isValid) {
         return res.status(400).json({ error: 'Invalid 2FA code' });
@@ -55,7 +52,6 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true });
     }
 
-    // DELETE: Disable 2FA
     if (req.method === 'DELETE') {
       await collection.updateOne(
         { _id: 'main_content' },
@@ -68,4 +64,4 @@ module.exports = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-};
+}
