@@ -94,6 +94,7 @@ export const PortfolioProvider = ({ children }) => {
 
   const [showSecrets, setShowSecrets] = useState(false);
   const [showResume, setShowResume] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
 
   return (
     <PortfolioContext.Provider value={{
@@ -106,7 +107,8 @@ export const PortfolioProvider = ({ children }) => {
       has2FA,
       isLoading,
       showSecrets, setShowSecrets,
-      showResume, setShowResume
+      showResume, setShowResume,
+      showTerminal, setShowTerminal
     }}>
       {children}
     </PortfolioContext.Provider>

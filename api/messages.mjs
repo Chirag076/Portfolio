@@ -1,12 +1,10 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function connectToDatabase() {
   if (cachedClient) return cachedClient;
-  if (!uri) throw new Error("MONGODB_URI is missing");
-  
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
@@ -17,51 +15,32 @@ export default async function handler(req, res) {
   try {
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
-    const messagesCollection = db.collection('messages');
-    const contentCollection = db.collection('content');
-
-    if (req.method === 'POST') {
-      const { name, email, message } = req.body;
-      if (!name || !email || !message) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-
-      const newMessage = {
-        name,
-        email,
-        message,
-        createdAt: new Date(),
-        read: false
-      };
-
-      await messagesCollection.insertOne(newMessage);
-      return res.status(200).json({ success: true });
-    }
-
-    const { password } = req.headers;
-    const currentConfig = await contentCollection.findOne({ _id: 'main_content' });
-    const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
-
-    if (!password || password !== validPassword) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const collection = db.collection('messages');
 
     if (req.method === 'GET') {
-      const messages = await messagesCollection.find({}).sort({ createdAt: -1 }).toArray();
+      const messages = await collection.find({}).sort({ createdAt: -1 }).limit(10).toArray();
       return res.status(200).json(messages);
     }
 
-    if (req.method === 'DELETE') {
-      const { id } = req.query;
-      if (!id) return res.status(400).json({ error: 'Missing message ID' });
+    if (req.method === 'POST') {
+      const { text, author = "Anonymous Visitor" } = req.body;
+      
+      if (!text || text.length > 200) {
+        return res.status(400).json({ error: "Message too long or empty (max 200 chars)" });
+      }
 
-      await messagesCollection.deleteOne({ _id: new ObjectId(id) });
+      const newMessage = {
+        text,
+        author,
+        createdAt: new Date(),
+      };
+
+      await collection.insertOne(newMessage);
       return res.status(200).json({ success: true });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
-    console.error("Messages API Error:", error);
-    return res.status(500).json({ error: "Database Error", details: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }

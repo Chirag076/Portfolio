@@ -80,6 +80,21 @@ const SecretsGuide = ({ onClose }) => {
               </div>
             </div>
 
+            {/* Secret 5: Command Palette */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors md:col-span-2">
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <span className="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">⌘</span> 
+                Command Palette Terminal
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                Access a professional-grade terminal console to navigate the portfolio with pure speed. Type commands like <span className="text-pink-400">projects</span>, <span className="text-pink-400">about</span>, or <span className="text-pink-400">skills</span> to control the UI via CLI.
+              </p>
+              <div className="bg-black/50 p-3 rounded text-xs font-mono text-indigo-400 border border-gray-800 tracking-wider flex items-center justify-between">
+                <span>Shortcut Trigger:</span>
+                <span className="font-bold border border-indigo-500/50 px-2 py-0.5 rounded">Ctrl + K</span>
+              </div>
+            </div>
+
           </div>
         </div>
       </motion.div>

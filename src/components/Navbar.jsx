@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { Terminal } from "lucide-react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Magnetic from "./Magnetic";
 import LocalTime from "./LocalTime";
@@ -9,7 +10,7 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [atTop, setAtTop] = useState(true);
-  const { setShowSecrets, setShowResume } = usePortfolio();
+  const { setShowSecrets, setShowResume, setShowTerminal } = usePortfolio();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious();
@@ -90,6 +91,15 @@ const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
             </a>
           </Magnetic>
         ))}
+        <div className="w-px h-5 bg-white/10 mx-2"></div>
+        <Magnetic intensity={0.2}>
+          <button
+            onClick={() => setShowTerminal(true)}
+            className="flex items-center gap-2 bg-white/5 border border-white/10 hover:border-white/30 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+          >
+            <Terminal size={14} className="text-gray-400" /> TERMINAL
+          </button>
+        </Magnetic>
         <div className="w-px h-5 bg-white/10 mx-2"></div>
         <Magnetic intensity={0.2}>
           <button

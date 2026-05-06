@@ -13,6 +13,7 @@ import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
 import SecretsGuide from "./components/SecretsGuide";
 import ScrollProgress from "./components/ScrollProgress";
+import TerminalConsole from "./components/TerminalConsole";
 import ResumeViewer from "./components/ResumeViewer";
 import Maintenance from "./components/Maintenance";
 import { usePortfolio } from "./context/PortfolioContext";
@@ -21,7 +22,7 @@ import confetti from "canvas-confetti";
 
 const App = () => {
   const [showSnakeGame, setShowSnakeGame] = useState(false);
-  const { showSecrets, setShowSecrets, showResume, setShowResume, maintenanceMode } = usePortfolio();
+  const { showSecrets, setShowSecrets, showResume, setShowResume, maintenanceMode, showTerminal, setShowTerminal } = usePortfolio();
 
   useEffect(() => {
     let originalTitle = document.title;
@@ -54,7 +55,14 @@ const App = () => {
         typedStr = typedStr.slice(-10);
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
+    const handleTerminal = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowTerminal(prev => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleTerminal);
 
     // KONAMI CODE LISTENER
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
@@ -71,14 +79,17 @@ const App = () => {
         konamiIndex = 0;
       }
     };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleTerminal);
     window.addEventListener("keydown", handleKonami);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleTerminal);
       window.removeEventListener("keydown", handleKonami);
     };
-  }, []);
+  }, [setShowTerminal]);
 
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -95,6 +106,7 @@ const App = () => {
       <SoundEngine />
       
       <AnimatePresence>
+        {showTerminal && <TerminalConsole onClose={() => setShowTerminal(false)} />}
         {showSnakeGame && <SnakeGame onClose={() => setShowSnakeGame(false)} />}
         {showSecrets && <SecretsGuide onClose={() => setShowSecrets(false)} />}
         {showResume && <ResumeViewer onClose={() => setShowResume(false)} />}
