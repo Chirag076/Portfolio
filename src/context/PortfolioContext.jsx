@@ -67,6 +67,7 @@ export const PortfolioProvider = ({ children }) => {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [visitorCount, setVisitorCount] = useState(0);
   const [socialLinks, setSocialLinks] = useState(defaultSocialLinks);
+  const [has2FA, setHas2FA] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // FETCH FROM MONGODB API
@@ -81,6 +82,7 @@ export const PortfolioProvider = ({ children }) => {
         if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
         if (data.visitorCount !== undefined) setVisitorCount(data.visitorCount);
         if (data.socialLinks) setSocialLinks(data.socialLinks);
+        if (data.has2FA !== undefined) setHas2FA(data.has2FA);
       } catch (err) {
         console.error("Failed to fetch from DB, using defaults.", err);
       } finally {
@@ -101,6 +103,7 @@ export const PortfolioProvider = ({ children }) => {
       maintenanceMode, setMaintenanceMode,
       visitorCount, setVisitorCount,
       socialLinks, setSocialLinks,
+      has2FA,
       isLoading,
       showSecrets, setShowSecrets,
       showResume, setShowResume

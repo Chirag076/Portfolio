@@ -4,6 +4,9 @@ import { useState } from "react";
 const AdminLogin = () => {
   const [error, setError] = useState("");
 
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -17,21 +20,30 @@ const AdminLogin = () => {
     }
 
     try {
-      // We verify the password by trying to fetch the content with it
-      // or we can just try a small POST update that does nothing but check auth
       const res = await fetch('/api/content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, content: {} }) // Empty content just to check password
+        body: JSON.stringify({ 
+          password, 
+          twoFactorCode,
+          content: {} 
+        })
       });
+
+      const data = await res.json();
 
       if (res.ok) {
         localStorage.setItem("admin-auth", "true");
         localStorage.setItem("admin-password", password);
+        if (twoFactorCode) localStorage.setItem("admin-2fa", twoFactorCode);
         window.location.href = "/admin/dashboard";
       } else {
-        const data = await res.json();
-        setError(data.error || "Invalid credentials ❌");
+        if (data.requires2FA) {
+          setShow2FA(true);
+          setError("Please enter your 6-digit 2FA code 📱");
+        } else {
+          setError(data.error || "Invalid credentials ❌");
+        }
       }
     } catch (err) {
       setError("Server error ❌ Check connection.");
@@ -107,6 +119,28 @@ const AdminLogin = () => {
               className="w-full mt-2 p-3 text-lg rounded-xl border-2 border-gray-300 bg-white/90 focus:border-pink-500 focus:ring-2 focus:ring-pink-300 transition-all duration-500"
             />
           </motion.div>
+
+          {/* 2FA Code */}
+          {show2FA && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4"
+            >
+              <label className="text-lg font-bold text-pink-600 flex items-center gap-2">
+                <span>📱</span> 2FA Code
+              </label>
+              <input
+                type="text"
+                maxLength="6"
+                placeholder="000000"
+                className="w-full mt-2 p-4 text-2xl tracking-[1em] text-center font-black rounded-xl border-2 border-pink-500 bg-pink-50 focus:ring-4 focus:ring-pink-200 transition-all"
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+                required
+              />
+            </motion.div>
+          )}
 
           {/* Login Button */}
           <motion.button

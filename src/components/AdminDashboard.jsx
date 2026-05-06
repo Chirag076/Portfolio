@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [saveStatus, setSaveStatus] = useState("");
   const [messages, setMessages] = useState([]);
   const [newPassword, setNewPassword] = useState("");
+  const [setup2FAData, setSetup2FAData] = useState(null);
 
   // INACTIVITY TIMER (5 Minutes)
   useEffect(() => {
@@ -341,16 +342,90 @@ const AdminDashboard = () => {
       {/* Security */}
       <section>
         <h2 className="text-xl font-bold mb-4 text-red-400">🔒 Security</h2>
-        <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
-          <label className="text-[10px] text-gray-500 uppercase font-bold">Change Admin Password</label>
-          <input 
-            type="password"
-            placeholder="Enter new password (leave blank to keep current)"
-            className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-red-500 py-2 mt-2"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <p className="text-[10px] text-gray-500 mt-2 italic">
+        <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-6">
+          <div>
+            <label className="text-[10px] text-gray-500 uppercase font-bold">Change Admin Password</label>
+            <input 
+              type="password"
+              placeholder="Enter new password (leave blank to keep current)"
+              className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-red-500 py-2 mt-2"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="pt-6 border-t border-white/10">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              Two-Factor Authentication (2FA)
+              {usePortfolio().has2FA && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Active</span>}
+            </h3>
+
+            {!usePortfolio().has2FA ? (
+              <div className="space-y-4">
+                {!setup2FAData ? (
+                  <button 
+                    onClick={async () => {
+                      const res = await fetch('/api/2fa', { headers: { password: localStorage.getItem("admin-password") } });
+                      const data = await res.json();
+                      setSetup2FAData(data);
+                    }}
+                    className="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-xl text-sm font-bold transition-all"
+                  >
+                    Setup Google Authenticator
+                  </button>
+                ) : (
+                  <div className="bg-white p-6 rounded-2xl flex flex-col items-center gap-4 max-w-xs mx-auto">
+                    <img src={setup2FAData.qrCodeUrl} alt="QR Code" className="w-48 h-48" />
+                    <p className="text-black text-xs font-mono break-all text-center">{setup2FAData.secret}</p>
+                    <div className="w-full">
+                      <input 
+                        type="text" 
+                        placeholder="Enter 6-digit code" 
+                        maxLength="6"
+                        className="w-full p-2 border-2 border-purple-500 rounded-lg text-black text-center font-bold"
+                        onChange={async (e) => {
+                          if (e.target.value.length === 6) {
+                            const res = await fetch('/api/2fa', {
+                              method: 'POST',
+                              headers: { 
+                                'Content-Type': 'application/json',
+                                password: localStorage.getItem("admin-password")
+                              },
+                              body: JSON.stringify({ secret: setup2FAData.secret, code: e.target.value })
+                            });
+                            if (res.ok) {
+                              localStorage.setItem("admin-2fa", e.target.value);
+                              window.location.reload();
+                            } else {
+                              alert("Invalid code. Try again.");
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={async () => {
+                  if (window.confirm("Disable 2FA? This makes your account less secure.")) {
+                    await fetch('/api/2fa', { 
+                      method: 'DELETE',
+                      headers: { password: localStorage.getItem("admin-password") }
+                    });
+                    localStorage.removeItem("admin-2fa");
+                    window.location.reload();
+                  }
+                }}
+                className="bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500 hover:text-white px-6 py-2 rounded-xl text-sm font-bold transition-all"
+              >
+                Disable 2FA
+              </button>
+            )}
+          </div>
+          
+          <p className="text-[10px] text-gray-500 italic">
             *Once updated, your .env password will only work as a fallback if the DB is reset.
           </p>
         </div>
@@ -362,6 +437,7 @@ const AdminDashboard = () => {
     setIsSaving(true);
     setSaveStatus("Saving to MongoDB...");
     const password = localStorage.getItem("admin-password");
+    const twoFactorCode = localStorage.getItem("admin-2fa");
 
     try {
       const res = await fetch('/api/content', {
@@ -369,6 +445,7 @@ const AdminDashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           password: password,
+          twoFactorCode: twoFactorCode,
           content: { 
             projects, 
             services, 
