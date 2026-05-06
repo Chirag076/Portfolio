@@ -1,4 +1,9 @@
 import { MongoClient } from 'mongodb';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { authenticator } = require('otplib');
+const QRCode = require('qrcode');
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -15,14 +20,6 @@ async function connectToDatabase() {
 
 export default async function handler(req, res) {
   try {
-    const otplib = await import('otplib');
-    const authenticator = otplib.authenticator || otplib.default?.authenticator;
-    
-    const qrcodeModule = await import('qrcode');
-    const QRCode = qrcodeModule.default || qrcodeModule;
-
-    if (!authenticator) throw new Error("Could not find authenticator in otplib");
-
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
