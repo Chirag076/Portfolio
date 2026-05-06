@@ -15,8 +15,8 @@ const About = () => {
 
     let i = 0;
     const typingInterval = setInterval(() => {
-      if (i < fullText.length - 1) {
-        setText((prev) => prev + fullText.charAt(i));
+      if (i <= fullText.length) {
+        setText(fullText.slice(0, i));
         i++;
       } else {
         clearInterval(typingInterval);
