@@ -44,29 +44,39 @@ export default async function handler(req, res) {
       const { password, content, twoFactorCode } = req.body;
       const currentConfig = await collection.findOne({ _id: 'main_content' });
       
-      // --- FLEXIBLE LOGIN LOGIC ---
-      
-      // A. Try 2FA Code (If provided and enabled)
-      if (twoFactorCode && currentConfig?.twoFactorSecret) {
+      // --- ENFORCED 2FA LOGIC (If enabled) ---
+      if (currentConfig?.twoFactorSecret) {
+        if (!twoFactorCode) {
+          return res.status(401).json({ 
+            error: 'Unauthorized', 
+            details: '2FA code required.' 
+          });
+        }
+
         const totp = new OTPAuth.TOTP({
           secret: currentConfig.twoFactorSecret
         });
         const delta = totp.validate({ token: twoFactorCode, window: 1 });
         
-        if (delta !== null) {
-          // 2FA worked!
-          if (content && Object.keys(content).length > 0) {
-            await collection.updateOne(
-              { _id: 'main_content' },
-              { $set: { ...content, updatedAt: new Date() } },
-              { upsert: true }
-            );
-          }
-          return res.status(200).json({ success: true });
+        if (delta === null) {
+          return res.status(401).json({ 
+            error: 'Unauthorized', 
+            details: 'Invalid 2FA code.' 
+          });
         }
+
+        // 2FA Success!
+        if (content && Object.keys(content).length > 0) {
+          await collection.updateOne(
+            { _id: 'main_content' },
+            { $set: { ...content, updatedAt: new Date() } },
+            { upsert: true }
+          );
+        }
+        return res.status(200).json({ success: true });
       }
 
-      // B. Fallback to Password
+      // --- PASSWORD FALLBACK (Only if 2FA is NOT enabled) ---
       const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
       if (password && password === validPassword) {
         if (content && Object.keys(content).length > 0) {

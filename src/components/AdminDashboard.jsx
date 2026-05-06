@@ -448,7 +448,17 @@ const AdminDashboard = () => {
     setIsSaving(true);
     setSaveStatus("Saving to MongoDB...");
     const password = localStorage.getItem("admin-password");
-    const twoFactorCode = localStorage.getItem("admin-2fa");
+    let twoFactorCode = null;
+
+    // If 2FA is enabled, always require a fresh code for any update
+    if (has2FA) {
+      twoFactorCode = prompt("Enter fresh 6-digit 2FA code to authorize changes:");
+      if (!twoFactorCode) {
+        setIsSaving(false);
+        setSaveStatus("Save cancelled: 2FA code required.");
+        return;
+      }
+    }
 
     try {
       const res = await fetch('/api/content', {

@@ -39,7 +39,6 @@ const AdminLogin = () => {
       if (res.ok) {
         localStorage.setItem("admin-auth", "true");
         if (password) localStorage.setItem("admin-password", password);
-        if (twoFactorCode) localStorage.setItem("admin-2fa", twoFactorCode);
         window.location.href = "/admin/dashboard";
       } else {
         setError(data.error || "Invalid credentials ❌");
