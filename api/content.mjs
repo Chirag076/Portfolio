@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
-import * as otplib from 'otplib';
+import * as OTPAuth from 'otpauth';
 
-const { authenticator } = otplib;
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
@@ -55,8 +54,13 @@ export default async function handler(req, res) {
         if (!twoFactorCode) {
           return res.status(401).json({ error: '2FA Code Required', requires2FA: true });
         }
-        const isValid = authenticator.check(twoFactorCode, currentConfig.twoFactorSecret);
-        if (!isValid) {
+        
+        const totp = new OTPAuth.TOTP({
+          secret: currentConfig.twoFactorSecret
+        });
+        
+        const delta = totp.validate({ token: twoFactorCode, window: 1 });
+        if (delta === null) {
           return res.status(401).json({ error: 'Invalid 2FA Code', requires2FA: true });
         }
       }

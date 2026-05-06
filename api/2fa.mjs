@@ -1,9 +1,6 @@
 import { MongoClient } from 'mongodb';
-import * as otplib from 'otplib';
-import * as qrcodeModule from 'qrcode';
-
-const { authenticator } = otplib;
-const QRCode = qrcodeModule.default || qrcodeModule;
+import * as OTPAuth from 'otpauth';
+import QRCode from 'qrcode';
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -33,17 +30,32 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET') {
-      const secret = authenticator.generateSecret();
-      const otpauth = authenticator.keyuri('Admin', 'Portfolio', secret);
-      const qrCodeUrl = await QRCode.toDataURL(otpauth);
+      const secret = new OTPAuth.Secret();
+      const totp = new OTPAuth.TOTP({
+        issuer: 'Portfolio',
+        label: 'Admin',
+        algorithm: 'SHA1',
+        digits: 6,
+        period: 30,
+        secret: secret
+      });
 
-      return res.status(200).json({ secret, qrCodeUrl });
+      const qrCodeUrl = await QRCode.toDataURL(totp.toString());
+      return res.status(200).json({ 
+        secret: secret.base32, 
+        qrCodeUrl 
+      });
     }
 
     if (req.method === 'POST') {
       const { secret, code } = req.body;
-      const isValid = authenticator.check(code, secret);
-      if (!isValid) {
+      
+      const totp = new OTPAuth.TOTP({
+        secret: secret
+      });
+      
+      const delta = totp.validate({ token: code, window: 1 });
+      if (delta === null) {
         return res.status(400).json({ error: 'Invalid 2FA code' });
       }
 
@@ -65,6 +77,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
+    console.error("2FA API Error:", error);
     return res.status(500).json({ error: error.message });
   }
 }
