@@ -1,80 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Magnetic from "./Magnetic";
 
 const NotFound = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
+
   return (
-    <div className="w-full h-screen bg-black flex flex-col items-center justify-center text-white overflow-hidden relative">
-      {/* Background Glitch Effect */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#ec4899_0%,_transparent_70%)] animate-pulse"></div>
-      </div>
+    <div 
+      onMouseMove={handleMouseMove}
+      className="w-full h-screen bg-black flex flex-col items-center justify-center text-white overflow-hidden relative cursor-none"
+    >
+      {/* Spotlight Effect */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-20"
+        style={{
+          background: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.98) 100%)`
+        }}
+      />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
         className="z-10 text-center"
       >
-        <motion.h1 
-          animate={{ 
-            x: [0, -5, 5, -2, 2, 0],
-            textShadow: [
-              "0 0 0px #fff",
-              "2px 0 10px #ff00ff",
-              "-2px 0 10px #00ffff",
-              "0 0 0px #fff"
-            ]
-          }}
-          transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 3 }}
-          className="text-[15vw] font-black leading-none mb-8"
-        >
+        <h1 className="text-[20vw] font-black tracking-tighter leading-none mb-4 text-white/90">
           404
-        </motion.h1>
+        </h1>
         
-        <p className="text-2xl md:text-3xl font-mono text-gray-400 mb-12">
-          SYSTEM ERROR: PAGE_NOT_FOUND
+        <p className="text-xl md:text-2xl font-light text-white/40 mb-12 tracking-[0.2em] uppercase">
+          You are lost in the dark.
         </p>
 
         <div className="flex justify-center">
-          <Magnetic intensity={0.3}>
+          <Magnetic intensity={0.2}>
             <Link
               to="/"
-              className="relative inline-block text-xl font-extrabold uppercase text-white px-10 py-4 rounded-full
-                       border-[4px] border-transparent overflow-hidden transition-all duration-500
-                       hover:shadow-[0_0_40px_rgba(236,72,153,0.5)] bg-gradient-to-r from-pink-600 to-purple-600"
+              className="px-12 py-4 bg-white text-black font-bold uppercase tracking-widest rounded-full hover:bg-pink-500 hover:text-white transition-all duration-300"
             >
-              Back to Reality
+              Find Home
             </Link>
           </Magnetic>
         </div>
       </motion.div>
 
-      {/* Floating debris */}
-      {[...Array(10)].map((_, i) => (
-        <motion.div
-          key={i}
-          drag
-          dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
-          className="absolute w-12 h-12 border border-white/10 rounded bg-white/5 backdrop-blur-sm cursor-grab active:cursor-grabbing flex items-center justify-center font-mono text-xs text-white/20"
-          style={{
-            top: `${Math.random() * 80 + 10}%`,
-            left: `${Math.random() * 80 + 10}%`,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: Math.random() * 5 + 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          {["{ }", "[]", "< >", "/", "*", "#", "!", "0", "1"][i % 9]}
-        </motion.div>
-      ))}
+      {/* Custom Cursor Dot */}
+      <div 
+        className="fixed w-4 h-4 bg-white rounded-full z-[100] pointer-events-none mix-difference"
+        style={{ left: mousePos.x, top: mousePos.y, transform: 'translate(-50%, -50%)' }}
+      />
     </div>
   );
 };

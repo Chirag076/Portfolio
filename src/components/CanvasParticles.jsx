@@ -74,33 +74,35 @@ const CanvasParticles = () => {
 
     const init = () => {
       particles = [];
-      // Lower density for better performance
-      const numberOfParticles = (canvas.width * canvas.height) / (isMobile ? 15000 : 12000);
+      // Significantly lower density for silky smooth performance
+      const numberOfParticles = (canvas.width * canvas.height) / (isMobile ? 25000 : 20000);
       for (let i = 0; i < numberOfParticles; i++) {
-        let size = Math.random() * 1.5 + 1;
+        let size = Math.random() * 1.2 + 0.8;
         let x = Math.random() * (window.innerWidth - size * 2) + size;
         let y = Math.random() * (window.innerHeight - size * 2) + size;
-        let directionX = (Math.random() - 0.5) * 0.8;
-        let directionY = (Math.random() - 0.5) * 0.8;
-        let color = "rgba(255, 255, 255, 0.2)";
+        let directionX = (Math.random() - 0.5) * 0.5;
+        let directionY = (Math.random() - 0.5) * 0.5;
+        let color = "rgba(255, 255, 255, 0.15)";
         particles.push(new Particle(x, y, directionX, directionY, size, color));
       }
     };
 
     const connect = () => {
-      if (isMobile) return; // Disable connections on mobile for massive FPS boost
-      
+      // Disable connections entirely if performance is a priority or on smaller CPUs
+      // Only draw connections if distance is very small
+      const maxDistance = isMobile ? 0 : 8000;
+      if (maxDistance === 0) return;
+
       for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-          let distance =
-            (particles[a].x - particles[b].x) * (particles[a].x - particles[b].x) +
-            (particles[a].y - particles[b].y) * (particles[a].y - particles[b].y);
+        for (let b = a + 1; b < particles.length; b++) {
+          let dx = particles[a].x - particles[b].x;
+          let dy = particles[a].y - particles[b].y;
+          let distanceSq = dx * dx + dy * dy;
           
-          const maxDistance = 15000;
-          if (distance < maxDistance) {
-            let opacity = 1 - distance / maxDistance;
-            ctx.strokeStyle = `rgba(236, 72, 153, ${opacity * 0.15})`;
-            ctx.lineWidth = 1;
+          if (distanceSq < maxDistance) {
+            let opacity = 1 - distanceSq / maxDistance;
+            ctx.strokeStyle = `rgba(236, 72, 153, ${opacity * 0.1})`;
+            ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);

@@ -24,13 +24,15 @@ const ProjectCard = ({ project, index }) => {
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
+    const xPos = e.clientX - rect.left;
+    const yPos = e.clientY - rect.top;
+    cardRef.current.style.setProperty("--x", `${xPos}px`);
+    cardRef.current.style.setProperty("--y", `${yPos}px`);
+    
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    // Map mouse position over a wider range so it doesn't max out instantly
-    const moveX = e.clientX - centerX;
-    const moveY = e.clientY - centerY;
-    x.set(moveX);
-    y.set(moveY);
+    x.set(e.clientX - centerX);
+    y.set(e.clientY - centerY);
   };
 
   const handleMouseLeave = () => {
@@ -49,14 +51,13 @@ const ProjectCard = ({ project, index }) => {
         transformStyle: "preserve-3d",
         perspective: 1000,
         willChange: "transform",
+        background: `radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(236, 72, 153, 0.08), transparent 40%), #151515`
       }}
       initial={{ opacity: 0, y: 150 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.6 }}
       transition={{ duration: 0.8, delay: index * 0.3 }}
-      // Removed whileHover scale to prevent Framer Motion transform conflict
-      // Removed backdrop-blur to prevent extreme GPU lag when rotating
-      className="flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 md:gap-10 bg-[#151515] hover:bg-[#1a1a1a] rounded-3xl p-6 sm:p-8 md:p-10 lg:p-14 transition-colors duration-500 border border-white/5 hover:border-white/10 hover:shadow-[0_0_80px_rgba(255,255,255,0.1)]"
+      className="flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 md:gap-10 rounded-3xl p-6 sm:p-8 md:p-10 lg:p-14 transition-colors duration-500 border border-white/5 hover:border-white/10"
     >
       {/* Project Image */}
       <div className="w-full md:w-1/3 rounded-2xl overflow-hidden border-2 sm:border-4 border-white/30">

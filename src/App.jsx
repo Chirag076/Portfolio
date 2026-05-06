@@ -12,6 +12,7 @@ import ContextMenu from "./components/ContextMenu";
 import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
 import SecretsGuide from "./components/SecretsGuide";
+import ScrollProgress from "./components/ScrollProgress";
 import ResumeViewer from "./components/ResumeViewer";
 import Maintenance from "./components/Maintenance";
 import { usePortfolio } from "./context/PortfolioContext";
@@ -88,6 +89,7 @@ const App = () => {
 
   return (
     <SmoothScroll>
+      <ScrollProgress />
       <Preloader />
       <ContextMenu />
       <SoundEngine />
