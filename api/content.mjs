@@ -15,7 +15,11 @@ async function connectToDatabase() {
 
 export default async function handler(req, res) {
   try {
-    const { authenticator } = await import('otplib');
+    const otplib = await import('otplib');
+    const authenticator = otplib.authenticator || otplib.default?.authenticator;
+    
+    if (!authenticator) throw new Error("Could not find authenticator in otplib");
+
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
