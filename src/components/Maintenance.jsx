@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Hammer, Settings, Wrench } from "lucide-react";
+import { Settings, Wrench } from "lucide-react";
 
 const Maintenance = () => {
   return (

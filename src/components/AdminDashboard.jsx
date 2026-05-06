@@ -9,7 +9,7 @@ const AdminDashboard = () => {
     services, setServices, 
     experience, setExperience,
     maintenanceMode, setMaintenanceMode,
-    visitorCount, setVisitorCount,
+    visitorCount,
     socialLinks, setSocialLinks
   } = usePortfolio();
 
