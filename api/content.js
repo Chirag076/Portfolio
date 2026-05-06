@@ -23,10 +23,23 @@ module.exports = async (req, res) => {
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
 
-    // GET: Load all portfolio data
+    // GET: Load all portfolio data + Increment visitor count
     if (req.method === 'GET') {
-      const data = await collection.findOne({ _id: 'main_content' });
-      // Return empty object so frontend keeps its local defaults if DB is empty
+      // Increment visitor count on every main site load
+      const updateResult = await collection.findOneAndUpdate(
+        { _id: 'main_content' },
+        { $inc: { visitorCount: 1 } },
+        { upsert: true, returnDocument: 'after' }
+      );
+      
+      // Handle different MongoDB driver return structures
+      const data = updateResult.value || updateResult;
+      
+      // Never send the admin password to the public
+      if (data && data.adminPassword) {
+        delete data.adminPassword;
+      }
+
       return res.status(200).json(data || {});
     }
 
@@ -34,19 +47,21 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
       const { password, content } = req.body;
       
-      if (!password || password !== process.env.ADMIN_PASSWORD) {
+      // Check password against DB override first, then env
+      const currentConfig = await collection.findOne({ _id: 'main_content' });
+      const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
+
+      if (!password || password !== validPassword) {
         return res.status(401).json({ error: 'Unauthorized: Invalid Password' });
       }
 
-      if (!content) {
-        return res.status(400).json({ error: 'Bad Request: No content provided' });
+      if (content && Object.keys(content).length > 0) {
+        await collection.updateOne(
+          { _id: 'main_content' },
+          { $set: { ...content, updatedAt: new Date() } },
+          { upsert: true }
+        );
       }
-
-      await collection.updateOne(
-        { _id: 'main_content' },
-        { $set: { ...content, updatedAt: new Date() } },
-        { upsert: true }
-      );
 
       return res.status(200).json({ success: true });
     }

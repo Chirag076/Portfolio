@@ -4,19 +4,37 @@ import { useState } from "react";
 const AdminLogin = () => {
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
     const username = e.target.username.value;
     const password = e.target.password.value;
 
-    // SIMPLE DEMO LOGIN (replace with backend or Firebase later)
-    if (username === "admin" && password === "1234") {
-      localStorage.setItem("admin-auth", "true");
-      localStorage.setItem("admin-password", password);
-      window.location.href = "/admin/dashboard";
-    } else {
-      setError("Invalid credentials ❌");
+    if (username !== "admin") {
+      setError("Invalid username ❌");
+      return;
+    }
+
+    try {
+      // We verify the password by trying to fetch the content with it
+      // or we can just try a small POST update that does nothing but check auth
+      const res = await fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, content: {} }) // Empty content just to check password
+      });
+
+      if (res.ok) {
+        localStorage.setItem("admin-auth", "true");
+        localStorage.setItem("admin-password", password);
+        window.location.href = "/admin/dashboard";
+      } else {
+        const data = await res.json();
+        setError(data.error || "Invalid credentials ❌");
+      }
+    } catch (err) {
+      setError("Server error ❌ Check connection.");
     }
   };
 

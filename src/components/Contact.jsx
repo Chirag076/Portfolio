@@ -13,24 +13,42 @@ const Contact = () => {
   const y1 = useTransform(scrollYProgress, [0, 1], ["-30%", "30%"]);
   const y2 = useTransform(scrollYProgress, [0, 1], ["30%", "-30%"]);
 
-  const sendEmail = (e) => {
+  const sendEmail = async (e) => {
     e.preventDefault();
-    emailjs
-      .sendForm(
-        "service_ryfoaqn", // replace
-        "template_vw4a6gu", // replace
+    
+    const formData = new FormData(form.current);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message')
+    };
+
+    try {
+      // 1. Save to MongoDB via our API
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      // 2. Also send via EmailJS as backup/notification
+      emailjs.sendForm(
+        "service_ryfoaqn",
+        "template_vw4a6gu",
         form.current,
-        "7q-uiXHo9f6scXtuS" // replace
-      )
-      .then(
-        () => {
-          alert("Message sent successfully 🚀");
-          e.target.reset();
-        },
-        () => {
-          alert("Failed to send ❌");
-        }
+        "7q-uiXHo9f6scXtuS"
       );
+
+      if (res.ok) {
+        alert("Message sent successfully 🚀");
+        e.target.reset();
+      } else {
+        alert("Failed to save message ❌");
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Network error ❌");
+    }
   };
 
   return (

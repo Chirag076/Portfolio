@@ -1,8 +1,10 @@
 import React, { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Mail, Github, Linkedin, Twitter } from "lucide-react";
+import { usePortfolio } from "../context/PortfolioContext";
 
 const ContactCard = () => {
+  const { socialLinks } = usePortfolio();
   const cardRef = useRef(null);
 
   const x = useMotionValue(0);
@@ -60,25 +62,25 @@ const ContactCard = () => {
           <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-orange-500 mb-6 flex items-center justify-center shadow-lg shadow-pink-500/30">
             <span className="text-3xl font-extrabold text-white">C</span>
           </div>
-          <h3 className="text-3xl font-extrabold text-white tracking-wide drop-shadow-md">Chirag Chhabra</h3>
+          <h3 className="text-3xl font-extrabold text-white tracking-wide drop-shadow-md">Chirag Parmar</h3>
           <p className="text-pink-400 font-mono mt-2 tracking-widest uppercase text-sm">Full-Stack Engineer</p>
         </div>
 
         {/* Bottom Socials */}
         <div className="relative z-10 flex flex-col gap-4" style={{ transform: "translateZ(40px)" }}>
-          <a href="mailto:chiragchhabrahmo@gmail.com" className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors bg-black/40 p-4 rounded-xl border border-white/10 hover:border-pink-500/50 backdrop-blur-md group">
+          <a href={socialLinks.email} className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors bg-black/40 p-4 rounded-xl border border-white/10 hover:border-pink-500/50 backdrop-blur-md group">
             <Mail size={20} className="group-hover:scale-110 transition-transform text-pink-400" />
-            <span className="font-mono text-sm">chiragchhabrahmo@gmail.com</span>
+            <span className="font-mono text-[10px] sm:text-sm truncate">{socialLinks.email.replace('mailto:', '')}</span>
           </a>
 
           <div className="flex gap-4 mt-2">
-            <a href="https://github.com/Chirag076" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 hover:shadow-[0_0_20px_rgba(236,72,153,0.5)] transition-all group">
+            <a href={socialLinks.github} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 hover:shadow-[0_0_20px_rgba(236,72,153,0.5)] transition-all group">
               <Github size={20} className="text-gray-300 group-hover:text-white transition-colors" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] transition-all group">
+            <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] transition-all group">
               <Linkedin size={20} className="text-gray-300 group-hover:text-white transition-colors" />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-500 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] transition-all group">
+            <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-sky-500 hover:border-sky-500 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] transition-all group">
               <Twitter size={20} className="text-gray-300 group-hover:text-white transition-colors" />
             </a>
           </div>

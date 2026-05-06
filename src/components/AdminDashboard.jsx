@@ -4,10 +4,20 @@ import { usePortfolio } from "../context/PortfolioContext";
 import { Save, Loader2, Plus, Trash2 } from "lucide-react";
 
 const AdminDashboard = () => {
-  const { projects, setProjects, services, setServices, experience, setExperience } = usePortfolio();
+  const { 
+    projects, setProjects, 
+    services, setServices, 
+    experience, setExperience,
+    maintenanceMode, setMaintenanceMode,
+    visitorCount, setVisitorCount,
+    socialLinks, setSocialLinks
+  } = usePortfolio();
+
   const [activeTab, setActiveTab] = useState("projects");
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [newPassword, setNewPassword] = useState("");
 
   // INACTIVITY TIMER (5 Minutes)
   useEffect(() => {
@@ -39,6 +49,40 @@ const AdminDashboard = () => {
     };
   }, []);
 
+  // Fetch Messages when tab is active
+  useEffect(() => {
+    if (activeTab === "messages") {
+      fetchMessages();
+    }
+  }, [activeTab]);
+
+  const fetchMessages = async () => {
+    const password = localStorage.getItem("admin-password");
+    try {
+      const res = await fetch('/api/messages', {
+        headers: { password }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setMessages(data);
+    } catch (err) {
+      console.error("Failed to fetch messages");
+    }
+  };
+
+  const deleteMessage = async (id) => {
+    if (!window.confirm("Delete this message?")) return;
+    const password = localStorage.getItem("admin-password");
+    try {
+      await fetch(`/api/messages?id=${id}`, {
+        method: 'DELETE',
+        headers: { password }
+      });
+      setMessages(messages.filter(m => m._id !== id));
+    } catch (err) {
+      alert("Failed to delete");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("admin-auth");
     localStorage.removeItem("admin-password");
@@ -55,6 +99,10 @@ const AdminDashboard = () => {
 
   const handleExperienceChange = (id, field, value) => {
     setExperience(experience.map(e => e.id === id ? { ...e, [field]: value } : e));
+  };
+
+  const handleSocialChange = (field, value) => {
+    setSocialLinks({ ...socialLinks, [field]: value });
   };
 
   const handleAddProject = () => {
@@ -214,10 +262,106 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderMessagesAdmin = () => (
+    <div className="space-y-6">
+      {messages.length === 0 && <p className="text-gray-500 italic">No messages yet...</p>}
+      {messages.map(m => (
+        <div key={m._id} className="p-6 bg-white/10 rounded-2xl border border-white/20 relative group">
+          <button 
+            onClick={() => deleteMessage(m._id)}
+            className="absolute top-4 right-4 text-red-500 hover:text-red-400 p-2 bg-black/20 rounded-lg"
+          >
+            <Trash2 size={18} />
+          </button>
+          <div className="flex flex-col md:flex-row justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-pink-400">{m.name}</h3>
+              <p className="text-sm text-purple-400">{m.email}</p>
+            </div>
+            <p className="text-[10px] text-gray-500 uppercase mt-2 md:mt-0">
+              {new Date(m.createdAt).toLocaleString()}
+            </p>
+          </div>
+          <p className="text-gray-300 leading-relaxed bg-black/20 p-4 rounded-xl border border-white/5 whitespace-pre-wrap">
+            {m.message}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderSettingsAdmin = () => (
+    <div className="space-y-12">
+      {/* Analytics */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 text-orange-400 flex items-center gap-2">
+          📈 Visitor Analytics
+        </h2>
+        <div className="p-8 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-3xl border border-white/20">
+          <p className="text-sm text-gray-400 uppercase tracking-widest font-bold">Total Page Views</p>
+          <p className="text-6xl font-black text-white mt-2 font-mono">{visitorCount}</p>
+        </div>
+      </section>
+
+      {/* Maintenance Mode */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 text-pink-400 flex items-center gap-2">
+          🚧 Maintenance Mode
+        </h2>
+        <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10">
+          <button 
+            onClick={() => setMaintenanceMode(!maintenanceMode)}
+            className={`w-14 h-8 rounded-full relative transition-all duration-300 ${maintenanceMode ? "bg-pink-500" : "bg-gray-700"}`}
+          >
+            <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all duration-300 ${maintenanceMode ? "left-7" : "left-1"}`}></div>
+          </button>
+          <span className="font-bold text-lg">
+            {maintenanceMode ? "Active (Visitors see Maintenance Screen)" : "Inactive (Public access)"}
+          </span>
+        </div>
+      </section>
+
+      {/* Social Links */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 text-purple-400">🔗 Social Links</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white/5 rounded-2xl border border-white/10">
+          {Object.keys(socialLinks).map(key => (
+            <div key={key}>
+              <label className="text-[10px] text-gray-500 uppercase font-bold capitalize">{key}</label>
+              <input 
+                className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-purple-500 py-2"
+                value={socialLinks[key]}
+                onChange={(e) => handleSocialChange(key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Security */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 text-red-400">🔒 Security</h2>
+        <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
+          <label className="text-[10px] text-gray-500 uppercase font-bold">Change Admin Password</label>
+          <input 
+            type="password"
+            placeholder="Enter new password (leave blank to keep current)"
+            className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-red-500 py-2 mt-2"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <p className="text-[10px] text-gray-500 mt-2 italic">
+            *Once updated, your .env password will only work as a fallback if the DB is reset.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+
   const handleSaveAll = async () => {
     setIsSaving(true);
     setSaveStatus("Saving to MongoDB...");
-    const password = localStorage.getItem("admin-password"); // We'll save this on login
+    const password = localStorage.getItem("admin-password");
 
     try {
       const res = await fetch('/api/content', {
@@ -225,13 +369,24 @@ const AdminDashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           password: password,
-          content: { projects, services, experience }
+          content: { 
+            projects, 
+            services, 
+            experience,
+            maintenanceMode,
+            socialLinks,
+            ...(newPassword && { adminPassword: newPassword })
+          }
         })
       });
 
       const data = await res.json();
       if (data.success) {
         setSaveStatus("Changes saved live! 🚀");
+        if (newPassword) {
+          localStorage.setItem("admin-password", newPassword);
+          setNewPassword("");
+        }
         setTimeout(() => setSaveStatus(""), 3000);
       } else {
         setSaveStatus("Error: " + (data.details || data.error));
@@ -278,14 +433,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8">
-          {["projects", "services", "experience"].map(tab => (
+        <div className="flex flex-wrap gap-2 md:gap-4 mb-8">
+          {["projects", "services", "experience", "messages", "settings"].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 rounded-full font-bold capitalize transition-all ${activeTab === tab ? "bg-white text-black" : "bg-white/10 hover:bg-white/20"}`}
+              className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold capitalize transition-all text-sm md:text-base ${activeTab === tab ? "bg-white text-black" : "bg-white/10 hover:bg-white/20"}`}
             >
-              {tab}
+              {tab === "messages" && messages.length > 0 ? `Inbox (${messages.length})` : tab}
             </button>
           ))}
         </div>
@@ -300,6 +455,8 @@ const AdminDashboard = () => {
           {activeTab === "projects" && renderProjectsAdmin()}
           {activeTab === "services" && renderServicesAdmin()}
           {activeTab === "experience" && renderExperienceAdmin()}
+          {activeTab === "messages" && renderMessagesAdmin()}
+          {activeTab === "settings" && renderSettingsAdmin()}
         </motion.div>
       </div>
     </div>

@@ -13,13 +13,14 @@ import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
 import SecretsGuide from "./components/SecretsGuide";
 import ResumeViewer from "./components/ResumeViewer";
+import Maintenance from "./components/Maintenance";
 import { usePortfolio } from "./context/PortfolioContext";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 const App = () => {
   const [showSnakeGame, setShowSnakeGame] = useState(false);
-  const { showSecrets, setShowSecrets, showResume, setShowResume } = usePortfolio();
+  const { showSecrets, setShowSecrets, showResume, setShowResume, maintenanceMode } = usePortfolio();
 
   useEffect(() => {
     let originalTitle = document.title;
@@ -79,6 +80,11 @@ const App = () => {
   }, []);
 
   const location = useLocation();
+  const isAdminPath = location.pathname.startsWith("/admin");
+
+  if (maintenanceMode && !isAdminPath) {
+    return <Maintenance />;
+  }
 
   return (
     <SmoothScroll>

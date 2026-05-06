@@ -49,6 +49,14 @@ const defaultExperience = [
   }
 ];
 
+const defaultSocialLinks = {
+  github: "https://github.com/Chirag076",
+  linkedin: "https://linkedin.com/in/chirag-parmar-b2713824b/",
+  twitter: "https://twitter.com/",
+  instagram: "https://instagram.com/",
+  email: "mailto:chiragparmar076@gmail.com"
+};
+
 export const PortfolioContext = createContext();
 export const usePortfolio = () => useContext(PortfolioContext);
 
@@ -56,6 +64,9 @@ export const PortfolioProvider = ({ children }) => {
   const [projects, setProjects] = useState(defaultProjects);
   const [services, setServices] = useState(defaultServices);
   const [experience, setExperience] = useState(defaultExperience);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [visitorCount, setVisitorCount] = useState(0);
+  const [socialLinks, setSocialLinks] = useState(defaultSocialLinks);
   const [isLoading, setIsLoading] = useState(true);
 
   // FETCH FROM MONGODB API
@@ -67,6 +78,9 @@ export const PortfolioProvider = ({ children }) => {
         if (data.projects) setProjects(data.projects);
         if (data.services) setServices(data.services);
         if (data.experience) setExperience(data.experience);
+        if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
+        if (data.visitorCount !== undefined) setVisitorCount(data.visitorCount);
+        if (data.socialLinks) setSocialLinks(data.socialLinks);
       } catch (err) {
         console.error("Failed to fetch from DB, using defaults.", err);
       } finally {
@@ -84,6 +98,9 @@ export const PortfolioProvider = ({ children }) => {
       projects, setProjects,
       services, setServices,
       experience, setExperience,
+      maintenanceMode, setMaintenanceMode,
+      visitorCount, setVisitorCount,
+      socialLinks, setSocialLinks,
       isLoading,
       showSecrets, setShowSecrets,
       showResume, setShowResume
