@@ -54,7 +54,7 @@ const defaultSocialLinks = {
   linkedin: "https://linkedin.com/in/chirag-parmar-b2713824b/",
   twitter: "https://twitter.com/",
   instagram: "https://instagram.com/",
-  email: "mailto:chiragparmar076@gmail.com"
+  email: "mailto:chiragchhabrahmo@gmail.com"
 };
 
 export const PortfolioContext = createContext();

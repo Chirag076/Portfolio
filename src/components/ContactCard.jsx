@@ -62,7 +62,7 @@ const ContactCard = () => {
           <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-orange-500 mb-6 flex items-center justify-center shadow-lg shadow-pink-500/30">
             <span className="text-3xl font-extrabold text-white">C</span>
           </div>
-          <h3 className="text-3xl font-extrabold text-white tracking-wide drop-shadow-md">Chirag Parmar</h3>
+          <h3 className="text-3xl font-extrabold text-white tracking-wide drop-shadow-md">Chirag Chhabra</h3>
           <p className="text-pink-400 font-mono mt-2 tracking-widest uppercase text-sm">Full-Stack Engineer</p>
         </div>
 
