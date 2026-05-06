@@ -43,57 +43,56 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const { password, content, twoFactorCode } = req.body;
       const currentConfig = await collection.findOne({ _id: 'main_content' });
-      
-      // --- ENFORCED 2FA LOGIC (If enabled) ---
-      if (currentConfig?.twoFactorSecret) {
-        if (!twoFactorCode) {
-          return res.status(401).json({ 
-            error: 'Unauthorized', 
-            details: '2FA code required.' 
-          });
-        }
+      const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
+      const has2FA = !!currentConfig?.twoFactorSecret;
 
+      let isAuthorized = false;
+      let used2FA = false;
+
+      // 1. Try 2FA Authentication
+      if (has2FA && twoFactorCode) {
         const totp = new OTPAuth.TOTP({
           secret: currentConfig.twoFactorSecret
         });
         const delta = totp.validate({ token: twoFactorCode, window: 1 });
-        
-        if (delta === null) {
-          return res.status(401).json({ 
-            error: 'Unauthorized', 
-            details: 'Invalid 2FA code.' 
-          });
+        if (delta !== null) {
+          isAuthorized = true;
+          used2FA = true;
         }
-
-        // 2FA Success!
-        if (content && Object.keys(content).length > 0) {
-          await collection.updateOne(
-            { _id: 'main_content' },
-            { $set: { ...content, updatedAt: new Date() } },
-            { upsert: true }
-          );
-        }
-        return res.status(200).json({ success: true });
       }
 
-      // --- PASSWORD FALLBACK (Only if 2FA is NOT enabled) ---
-      const validPassword = currentConfig?.adminPassword || process.env.ADMIN_PASSWORD;
-      if (password && password === validPassword) {
-        if (content && Object.keys(content).length > 0) {
-          await collection.updateOne(
-            { _id: 'main_content' },
-            { $set: { ...content, updatedAt: new Date() } },
-            { upsert: true }
-          );
-        }
-        return res.status(200).json({ success: true });
+      // 2. Try Password Authentication (if not already authorized by 2FA)
+      if (!isAuthorized && password && password === validPassword) {
+        isAuthorized = true;
       }
 
-      // If we reach here, neither worked
-      return res.status(401).json({ 
-        error: 'Unauthorized', 
-        details: 'Invalid code or password.' 
-      });
+      // 3. Final Check
+      if (!isAuthorized) {
+        return res.status(401).json({ 
+          error: 'Unauthorized', 
+          details: 'Invalid password or 2FA code.' 
+        });
+      }
+
+      // 4. Enforce 2FA for changes if it is enabled
+      const isMakingChanges = content && Object.keys(content).length > 0;
+      if (isMakingChanges && has2FA && !used2FA) {
+        return res.status(401).json({ 
+          error: 'Unauthorized', 
+          details: 'A valid 2FA code is required to save changes.' 
+        });
+      }
+
+      // 5. Apply Changes
+      if (isMakingChanges) {
+        await collection.updateOne(
+          { _id: 'main_content' },
+          { $set: { ...content, updatedAt: new Date() } },
+          { upsert: true }
+        );
+      }
+
+      return res.status(200).json({ success: true });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
