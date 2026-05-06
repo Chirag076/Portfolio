@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
-import { authenticator } from 'otplib';
+import otplib from 'otplib';
 
+const { authenticator } = otplib;
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
@@ -20,7 +21,6 @@ export default async function handler(req, res) {
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
 
-    // GET: Load all portfolio data + Increment visitor count
     if (req.method === 'GET') {
       const updateResult = await collection.findOneAndUpdate(
         { _id: 'main_content' },
@@ -41,7 +41,6 @@ export default async function handler(req, res) {
       return res.status(200).json(data || {});
     }
 
-    // POST: Update all portfolio data / Login
     if (req.method === 'POST') {
       const { password, content, twoFactorCode } = req.body;
       

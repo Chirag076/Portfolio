@@ -1,7 +1,8 @@
 import { MongoClient } from 'mongodb';
-import { authenticator } from 'otplib';
+import otplib from 'otplib';
 import QRCode from 'qrcode';
 
+const { authenticator } = otplib;
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
