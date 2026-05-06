@@ -1,8 +1,5 @@
 import { MongoClient } from 'mongodb';
-import otplib from 'otplib';
-import QRCode from 'qrcode';
 
-const { authenticator } = otplib;
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
@@ -18,6 +15,8 @@ async function connectToDatabase() {
 
 export default async function handler(req, res) {
   try {
+    const { authenticator } = await import('otplib');
+    const QRCode = await import('qrcode');
     const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
