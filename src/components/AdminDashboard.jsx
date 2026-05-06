@@ -366,9 +366,19 @@ const AdminDashboard = () => {
                 {!setup2FAData ? (
                   <button 
                     onClick={async () => {
-                      const res = await fetch('/api/2fa', { headers: { password: localStorage.getItem("admin-password") } });
-                      const data = await res.json();
-                      setSetup2FAData(data);
+                      try {
+                        const pass = localStorage.getItem("admin-password");
+                        const res = await fetch('/api/2fa', { headers: { password: pass } });
+                        if (!res.ok) {
+                          const errData = await res.json();
+                          throw new Error(errData.error || "Failed to start setup");
+                        }
+                        const data = await res.json();
+                        setSetup2FAData(data);
+                      } catch (err) {
+                        alert("Error: " + err.message + "\n\nMake sure you are running with 'vercel dev' or testing on the live site!");
+                        console.error(err);
+                      }
                     }}
                     className="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-xl text-sm font-bold transition-all"
                   >

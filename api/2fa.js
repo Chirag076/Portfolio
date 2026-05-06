@@ -3,19 +3,21 @@ const { authenticator } = require('otplib');
 const QRCode = require('qrcode');
 
 const uri = process.env.MONGODB_URI;
-let client;
-let clientPromise;
+let cachedClient = null;
 
-if (uri) {
-  client = new MongoClient(uri);
-  clientPromise = client.connect();
+async function connectToDatabase() {
+  if (cachedClient) return cachedClient;
+  if (!uri) throw new Error("MONGODB_URI is missing");
+  
+  const client = new MongoClient(uri);
+  await client.connect();
+  cachedClient = client;
+  return client;
 }
 
 module.exports = async (req, res) => {
-  if (!uri) return res.status(500).json({ error: "Missing MONGODB_URI" });
-
   try {
-    const connectedClient = await clientPromise;
+    const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
     const currentConfig = await collection.findOne({ _id: 'main_content' });

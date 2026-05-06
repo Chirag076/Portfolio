@@ -1,26 +1,22 @@
 const { MongoClient } = require('mongodb');
 const { authenticator } = require('otplib');
 
-// Create the client outside the handler for connection pooling
 const uri = process.env.MONGODB_URI;
-let client;
-let clientPromise;
+let cachedClient = null;
 
-if (!uri) {
-  console.error("MONGODB_URI is missing from environment variables!");
-} else {
-  client = new MongoClient(uri);
-  clientPromise = client.connect();
+async function connectToDatabase() {
+  if (cachedClient) return cachedClient;
+  if (!uri) throw new Error("MONGODB_URI is missing");
+  
+  const client = new MongoClient(uri);
+  await client.connect();
+  cachedClient = client;
+  return client;
 }
 
 module.exports = async (req, res) => {
-  // 1. Check if URI exists
-  if (!uri) {
-    return res.status(500).json({ error: "Configuration Error: MONGODB_URI is missing." });
-  }
-
   try {
-    const connectedClient = await clientPromise;
+    const connectedClient = await connectToDatabase();
     const db = connectedClient.db('portfolio_db');
     const collection = db.collection('content');
 
