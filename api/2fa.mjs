@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb';
-import { createRequire } from 'module';
+import * as otplib from 'otplib';
+import * as qrcodeModule from 'qrcode';
 
-const require = createRequire(import.meta.url);
-const { authenticator } = require('otplib');
-const QRCode = require('qrcode');
+const { authenticator } = otplib;
+const QRCode = qrcodeModule.default || qrcodeModule;
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
