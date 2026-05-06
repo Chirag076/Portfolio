@@ -4,7 +4,6 @@ import { useState } from "react";
 const AdminLogin = () => {
   const [error, setError] = useState("");
 
-  const [show2FA, setShow2FA] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState("");
 
   const handleLogin = async (e) => {
@@ -16,6 +15,11 @@ const AdminLogin = () => {
 
     if (username !== "admin") {
       setError("Invalid username ❌");
+      return;
+    }
+
+    if (!password && !twoFactorCode) {
+      setError("Please enter Password or 2FA Code 🔑");
       return;
     }
 
@@ -34,16 +38,11 @@ const AdminLogin = () => {
 
       if (res.ok) {
         localStorage.setItem("admin-auth", "true");
-        localStorage.setItem("admin-password", password);
+        if (password) localStorage.setItem("admin-password", password);
         if (twoFactorCode) localStorage.setItem("admin-2fa", twoFactorCode);
         window.location.href = "/admin/dashboard";
       } else {
-        if (data.requires2FA) {
-          setShow2FA(true);
-          setError("Please enter your 6-digit 2FA code 📱");
-        } else {
-          setError(data.error || "Invalid credentials ❌");
-        }
+        setError(data.error || "Invalid credentials ❌");
       }
     } catch (err) {
       setError("Server error ❌ Check connection.");
@@ -96,12 +95,12 @@ const AdminLogin = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <label className="text-lg font-bold text-gray-800">Username</label>
+            <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Username</label>
             <input
               type="text"
               name="username"
               required
-              className="w-full mt-2 p-3 text-lg rounded-xl border-2 border-gray-300 bg-white/90 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all duration-500"
+              className="w-full mt-2 p-3 text-lg rounded-xl border-2 border-gray-100 bg-gray-50 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
             />
           </motion.div>
 
@@ -111,36 +110,42 @@ const AdminLogin = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <label className="text-lg font-bold text-gray-800">Password</label>
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Password</label>
+              <span className="text-[10px] text-gray-400">OR Use 2FA Below</span>
+            </div>
             <input
               type="password"
               name="password"
-              required
-              className="w-full mt-2 p-3 text-lg rounded-xl border-2 border-gray-300 bg-white/90 focus:border-pink-500 focus:ring-2 focus:ring-pink-300 transition-all duration-500"
+              className="w-full mt-2 p-3 text-lg rounded-xl border-2 border-gray-100 bg-gray-50 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all outline-none"
             />
           </motion.div>
 
+          {/* Divider */}
+          <div className="relative flex items-center py-2">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="flex-shrink mx-4 text-gray-400 text-xs font-bold uppercase">OR</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
           {/* 2FA Code */}
-          {show2FA && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-4"
-            >
-              <label className="text-lg font-bold text-pink-600 flex items-center gap-2">
-                <span>📱</span> 2FA Code
-              </label>
-              <input
-                type="text"
-                maxLength="6"
-                placeholder="000000"
-                className="w-full mt-2 p-4 text-2xl tracking-[1em] text-center font-black rounded-xl border-2 border-pink-500 bg-pink-50 focus:ring-4 focus:ring-pink-200 transition-all"
-                value={twoFactorCode}
-                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
-                required
-              />
-            </motion.div>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4"
+          >
+            <label className="text-sm font-bold text-pink-600 uppercase tracking-widest flex items-center gap-2">
+              <span>📱</span> 2FA Code
+            </label>
+            <input
+              type="text"
+              maxLength="6"
+              placeholder="000000"
+              className="w-full mt-2 p-3 text-2xl tracking-[0.5em] text-center font-black rounded-xl border-2 border-pink-500 bg-pink-50 focus:ring-4 focus:ring-pink-100 transition-all outline-none"
+              value={twoFactorCode}
+              onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+            />
+          </motion.div>
 
           {/* Login Button */}
           <motion.button
