@@ -10,7 +10,8 @@ const AdminDashboard = () => {
     experience, setExperience,
     maintenanceMode, setMaintenanceMode,
     visitorCount,
-    socialLinks, setSocialLinks
+    socialLinks, setSocialLinks,
+    has2FA
   } = usePortfolio();
 
   const [activeTab, setActiveTab] = useState("projects");
@@ -357,10 +358,10 @@ const AdminDashboard = () => {
           <div className="pt-6 border-t border-white/10">
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               Two-Factor Authentication (2FA)
-              {usePortfolio().has2FA && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Active</span>}
+              {has2FA && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Active</span>}
             </h3>
 
-            {!usePortfolio().has2FA ? (
+            {!has2FA ? (
               <div className="space-y-4">
                 {!setup2FAData ? (
                   <button 
