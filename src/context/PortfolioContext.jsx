@@ -69,6 +69,11 @@ export const PortfolioProvider = ({ children }) => {
   const [socialLinks, setSocialLinks] = useState(defaultSocialLinks);
   const [has2FA, setHas2FA] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [notifications, setNotifications] = useState({
+    discordWebhookUrl: "",
+    telegramBotToken: "",
+    telegramChatId: ""
+  });
 
   // FETCH FROM MONGODB API
   useEffect(() => {
@@ -83,6 +88,7 @@ export const PortfolioProvider = ({ children }) => {
         if (data.visitorCount !== undefined) setVisitorCount(data.visitorCount);
         if (data.socialLinks) setSocialLinks(data.socialLinks);
         if (data.has2FA !== undefined) setHas2FA(data.has2FA);
+        if (data.notifications) setNotifications(data.notifications);
       } catch (err) {
         console.error("Failed to fetch from DB, using defaults.", err);
       } finally {
@@ -96,6 +102,24 @@ export const PortfolioProvider = ({ children }) => {
   const [showResume, setShowResume] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
 
+  const trackEvent = async (event, metadata = {}) => {
+    try {
+      const sessionRef = sessionStorage.getItem('recruiter_ref');
+      const finalMetadata = {
+        ref: sessionRef || undefined,
+        ...metadata
+      };
+
+      await fetch('/api/analytics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, metadata: finalMetadata })
+      });
+    } catch (err) {
+      console.error("Failed to log tracking event:", err);
+    }
+  };
+
   return (
     <PortfolioContext.Provider value={{
       projects, setProjects,
@@ -108,7 +132,9 @@ export const PortfolioProvider = ({ children }) => {
       isLoading,
       showSecrets, setShowSecrets,
       showResume, setShowResume,
-      showTerminal, setShowTerminal
+      showTerminal, setShowTerminal,
+      notifications, setNotifications,
+      trackEvent
     }}>
       {children}
     </PortfolioContext.Provider>

@@ -22,7 +22,24 @@ import confetti from "canvas-confetti";
 
 const App = () => {
   const [showSnakeGame, setShowSnakeGame] = useState(false);
-  const { showSecrets, setShowSecrets, showResume, setShowResume, maintenanceMode, showTerminal, setShowTerminal } = usePortfolio();
+  const { showSecrets, setShowSecrets, showResume, setShowResume, maintenanceMode, showTerminal, setShowTerminal, trackEvent } = usePortfolio();
+
+  // Track initial recruiter visits and general session visits
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref') || params.get('source') || params.get('utm_source');
+    const storedRef = sessionStorage.getItem('recruiter_ref');
+    const sessionVisited = sessionStorage.getItem('portfolio_session_visited');
+
+    if (ref && ref !== storedRef) {
+      sessionStorage.setItem('recruiter_ref', ref);
+      trackEvent('portfolio_visit', { ref });
+      sessionStorage.setItem('portfolio_session_visited', 'true');
+    } else if (!sessionVisited) {
+      trackEvent('portfolio_visit');
+      sessionStorage.setItem('portfolio_session_visited', 'true');
+    }
+  }, [trackEvent]);
 
   useEffect(() => {
     let originalTitle = document.title;

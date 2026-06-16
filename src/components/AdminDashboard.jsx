@@ -11,7 +11,9 @@ const AdminDashboard = () => {
     maintenanceMode, setMaintenanceMode,
     visitorCount,
     socialLinks, setSocialLinks,
-    has2FA
+    has2FA,
+    notifications, setNotifications,
+    trackEvent
   } = usePortfolio();
 
   const [activeTab, setActiveTab] = useState("projects");
@@ -20,6 +22,11 @@ const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newPassword, setNewPassword] = useState("");
   const [setup2FAData, setSetup2FAData] = useState(null);
+
+  // Recruiter Analytics & Image Upload States
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [uploadingProjectId, setUploadingProjectId] = useState(null);
+  const [uploadError, setUploadError] = useState("");
 
   // INACTIVITY TIMER (5 Minutes)
   useEffect(() => {
@@ -51,10 +58,13 @@ const AdminDashboard = () => {
     };
   }, []);
 
-  // Fetch Messages when tab is active
+  // Fetch Messages or Activity Log when tab is active
   useEffect(() => {
     if (activeTab === "messages") {
       fetchMessages();
+    }
+    if (activeTab === "activity") {
+      fetchActivityLogs();
     }
   }, [activeTab]);
 
@@ -68,6 +78,106 @@ const AdminDashboard = () => {
       if (Array.isArray(data)) setMessages(data);
     } catch (err) {
       console.error("Failed to fetch messages");
+    }
+  };
+
+  const fetchActivityLogs = async () => {
+    const password = localStorage.getItem("admin-password");
+    try {
+      const res = await fetch('/api/analytics', {
+        headers: { password }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setActivityLogs(data);
+    } catch (err) {
+      console.error("Failed to fetch activity logs", err);
+    }
+  };
+
+  // HTML Canvas Image Compression Helper (aims for <200KB WebP/JPEG)
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const max_size = 1200; // max width/height in px
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > max_size) {
+              height *= max_size / width;
+              width = max_size;
+            }
+          } else {
+            if (height > max_size) {
+              width *= max_size / height;
+              height = max_size;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG at 75% quality
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleImageUpload = async (projectId, file) => {
+    if (!file) return;
+    setUploadingProjectId(projectId);
+    setUploadError("");
+    
+    try {
+      const base64Image = await compressImage(file);
+      const password = localStorage.getItem("admin-password");
+      
+      const res = await fetch("/api/images", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          password
+        },
+        body: JSON.stringify({
+          image: base64Image,
+          fileName: file.name
+        })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        handleProjectChange(projectId, "image", data.url);
+      } else {
+        setUploadError(data.error || "Upload failed");
+      }
+    } catch (err) {
+      setUploadError("Error compressing/uploading image");
+      console.error(err);
+    } finally {
+      setUploadingProjectId(null);
+    }
+  };
+
+  const handleTestWebhook = async () => {
+    setSaveStatus("Sending simulation event...");
+    try {
+      await trackEvent('portfolio_visit', { ref: 'DashboardTestWebhook' });
+      setSaveStatus("Simulation event sent! Check Discord/Telegram. 🚀");
+      setTimeout(() => setSaveStatus(""), 4000);
+    } catch (err) {
+      setSaveStatus("Failed to send simulation event.");
     }
   };
 
@@ -174,8 +284,49 @@ const AdminDashboard = () => {
           
           <div className="flex flex-col md:flex-row gap-4 mt-2">
             <div className="flex-1">
-              <label className="text-[10px] text-gray-500 uppercase font-bold">Image Path</label>
-              <input className="w-full bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white text-sm" value={p.image} onChange={(e) => handleProjectChange(p.id, "image", e.target.value)} />
+              <label className="text-[10px] text-gray-500 uppercase font-bold">Project Image</label>
+              <div className="flex items-center gap-3 mt-1">
+                <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/10 bg-white/5 flex-shrink-0 flex items-center justify-center">
+                  {p.image ? (
+                    <img src={p.image} alt="preview" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/images/placeholder.png'; }} />
+                  ) : (
+                    <span className="text-xs text-gray-500">No img</span>
+                  )}
+                </div>
+                
+                <input 
+                  className="flex-1 bg-transparent text-gray-400 outline-none border-b border-white/20 focus:border-white text-sm" 
+                  value={p.image} 
+                  onChange={(e) => handleProjectChange(p.id, "image", e.target.value)} 
+                  placeholder="/images/placeholder.png or Uploaded URL"
+                />
+                
+                <label className="cursor-pointer px-4 py-1.5 bg-pink-500/10 border border-pink-500/30 hover:bg-pink-500/20 text-pink-400 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap">
+                  {uploadingProjectId === p.id ? (
+                    <>
+                      <Loader2 className="animate-spin" size={12} /> Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={12} /> Upload File
+                    </>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    disabled={uploadingProjectId !== null}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleImageUpload(p.id, e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+              {uploadError && uploadingProjectId === p.id && (
+                <p className="text-red-400 text-[10px] mt-1">{uploadError}</p>
+              )}
             </div>
             <div className="flex-1">
               <label className="text-[10px] text-gray-500 uppercase font-bold">Project Link</label>
@@ -289,6 +440,91 @@ const AdminDashboard = () => {
           </p>
         </div>
       ))}
+    </div>
+  );
+
+  const renderActivityAdmin = () => (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-pink-400">📊 Recent Recruiter & Visitor Activity</h2>
+        <button 
+          onClick={fetchActivityLogs}
+          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold transition-all"
+        >
+          Refresh
+        </button>
+      </div>
+      
+      {activityLogs.length === 0 && <p className="text-gray-500 italic">No activity logged yet...</p>}
+      
+      {activityLogs.length > 0 && (
+        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
+          <table className="w-full border-collapse text-left text-sm text-gray-300">
+            <thead className="bg-white/10 text-white font-bold text-xs uppercase tracking-wider">
+              <tr>
+                <th className="p-4">Time</th>
+                <th className="p-4">Event</th>
+                <th className="p-4">Company/ISP</th>
+                <th className="p-4">Location</th>
+                <th className="p-4">Ref/Source</th>
+                <th className="p-4">Device</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {activityLogs.map((log) => {
+                let eventLabel = log.event;
+                let eventBadge = "bg-white/10 text-white";
+                if (log.event === 'portfolio_visit') {
+                  eventLabel = '🚀 Visit';
+                  eventBadge = "bg-pink-500/20 text-pink-400 border border-pink-500/30";
+                } else if (log.event === 'resume_view') {
+                  eventLabel = '📄 Resume Open';
+                  eventBadge = "bg-purple-500/20 text-purple-400 border border-purple-500/30";
+                } else if (log.event === 'resume_view_duration') {
+                  eventLabel = `⏱️ Resume Read (${log.metadata?.duration}s)`;
+                  eventBadge = "bg-blue-500/20 text-blue-400 border border-blue-500/30";
+                } else if (log.event === 'resume_download') {
+                  eventLabel = '💾 Resume Download';
+                  eventBadge = "bg-orange-500/20 text-orange-400 border border-orange-500/30";
+                }
+
+                const flag = log.location?.flag || "🌐";
+                const city = log.location?.city || "Unknown";
+                const country = log.location?.country || "Unknown";
+                
+                const os = log.device?.os || "Unknown";
+                const browser = log.device?.browser || "Unknown";
+                const deviceIcon = os.toLowerCase().includes('iphone') || os.toLowerCase().includes('android') ? "📱" : "💻";
+
+                return (
+                  <tr key={log._id} className="hover:bg-white/5 transition-colors">
+                    <td className="p-4 font-mono text-xs whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleString()}
+                    </td>
+                    <td className="p-4">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${eventBadge}`}>
+                        {eventLabel}
+                      </span>
+                    </td>
+                    <td className="p-4 font-semibold text-white">
+                      {log.company}
+                    </td>
+                    <td className="p-4">
+                      <span className="mr-1">{flag}</span> {city}, {country}
+                    </td>
+                    <td className="p-4 font-mono text-xs text-pink-400">
+                      {log.metadata?.ref || log.metadata?.source || <span className="text-gray-600">direct</span>}
+                    </td>
+                    <td className="p-4 text-xs whitespace-nowrap">
+                      <span className="mr-1">{deviceIcon}</span> {os} / {browser}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 
@@ -441,6 +677,66 @@ const AdminDashboard = () => {
           </p>
         </div>
       </section>
+
+      {/* Recruiter Alerts Settings */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 text-pink-400 flex items-center gap-2">
+          🔔 Recruiter Activity Alerts
+        </h2>
+        <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Discord Integration</h3>
+              <div>
+                <label className="text-[10px] text-gray-500 uppercase font-bold">Discord Webhook URL</label>
+                <input 
+                  type="text" 
+                  placeholder="https://discord.com/api/webhooks/..." 
+                  className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-pink-500 py-2 mt-1"
+                  value={notifications.discordWebhookUrl || ""}
+                  onChange={(e) => setNotifications({ ...notifications, discordWebhookUrl: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Telegram Integration</h3>
+              <div>
+                <label className="text-[10px] text-gray-500 uppercase font-bold">Bot Token</label>
+                <input 
+                  type="password" 
+                  placeholder="123456789:ABCdefGhI..." 
+                  className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-pink-500 py-2 mt-1"
+                  value={notifications.telegramBotToken || ""}
+                  onChange={(e) => setNotifications({ ...notifications, telegramBotToken: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-500 uppercase font-bold">Chat ID</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. -10012345678 or 98765432" 
+                  className="w-full bg-transparent text-white outline-none border-b border-white/20 focus:border-pink-500 py-2 mt-1"
+                  value={notifications.telegramChatId || ""}
+                  onChange={(e) => setNotifications({ ...notifications, telegramChatId: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <p className="text-[10px] text-gray-500 italic max-w-md">
+              *Webhook tokens are stored securely in MongoDB and are never exposed on your public portfolio page.
+            </p>
+            <button 
+              onClick={handleTestWebhook}
+              className="px-5 py-2 bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 rounded-xl font-bold text-xs transition-all shrink-0"
+            >
+              Test Notification Webhook 🚀
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 
@@ -473,6 +769,7 @@ const AdminDashboard = () => {
             experience,
             maintenanceMode,
             socialLinks,
+            notifications,
             ...(newPassword && { adminPassword: newPassword })
           }
         })
@@ -532,13 +829,13 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 md:gap-4 mb-8">
-          {["projects", "services", "experience", "messages", "settings"].map(tab => (
+          {["projects", "services", "experience", "messages", "activity", "settings"].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold capitalize transition-all text-sm md:text-base ${activeTab === tab ? "bg-white text-black" : "bg-white/10 hover:bg-white/20"}`}
             >
-              {tab === "messages" && messages.length > 0 ? `Inbox (${messages.length})` : tab}
+              {tab === "messages" && messages.length > 0 ? `Inbox (${messages.length})` : tab === "activity" ? `Activity Log 📊` : tab}
             </button>
           ))}
         </div>
@@ -554,6 +851,7 @@ const AdminDashboard = () => {
           {activeTab === "services" && renderServicesAdmin()}
           {activeTab === "experience" && renderExperienceAdmin()}
           {activeTab === "messages" && renderMessagesAdmin()}
+          {activeTab === "activity" && renderActivityAdmin()}
           {activeTab === "settings" && renderSettingsAdmin()}
         </motion.div>
       </div>

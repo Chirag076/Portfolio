@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { usePortfolio } from "../context/PortfolioContext";
 
 const ResumeViewer = ({ onClose }) => {
+  const { trackEvent } = usePortfolio();
+  const startTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    trackEvent('resume_view');
+    startTimeRef.current = Date.now();
+
+    return () => {
+      const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
+      // Only track if they stayed for at least 1 second
+      if (duration >= 1) {
+        trackEvent('resume_view_duration', { duration });
+      }
+    };
+  }, [trackEvent]);
+
+  const handleDownloadClick = () => {
+    trackEvent('resume_download');
+  };
+
   return (
     <div className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-8">
       <motion.div
@@ -44,6 +65,7 @@ const ResumeViewer = ({ onClose }) => {
               href="https://drive.google.com/file/d/1wr5XXvB0QLwPFoHrozOY1ukkuxSqBQhY/view?usp=drive_link" 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={handleDownloadClick}
               className="text-xs text-gray-400 hover:text-pink-400 transition-colors underline"
             >
               Open in Google Drive ↗
