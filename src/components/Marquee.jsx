@@ -1,15 +1,29 @@
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useAnimationFrame,
+} from "framer-motion";
 import { useState, useEffect } from "react";
 
+/* No emoji. Emoji used as iconography is one of the fastest tells that a
+   page was generated rather than designed. */
 const skills = [
-  { name: "REACT", icon: "⚛️" },
-  { name: "NODE.JS", icon: "🟢" },
-  { name: "TAILWIND", icon: "💨" },
-  { name: "NEXT.JS", icon: "▲" },
-  { name: "MONGODB", icon: "🍃" },
-  { name: "TYPESCRIPT", icon: "📘" },
-  { name: "POSTGRESQL", icon: "🐘" },
+  { name: "TYPESCRIPT", note: "since 2024" },
+  { name: "NODE.JS", note: "APIs, workers" },
+  { name: "NESTJS", note: "Rocket Health" },
+  { name: "REACT", note: "web + native" },
+  { name: "POSTGRESQL", note: "Prisma" },
+  { name: "REDIS", note: "queues, replay" },
+  { name: "DOCKER", note: "40min to 5" },
 ];
+
+/* keeps the strip looping seamlessly no matter how far it is pushed */
+const wrap = (min, max, v) => {
+  const range = max - min;
+  return ((((v - min) % range) + range) % range) + min;
+};
 
 const Marquee = () => {
   const [hoveredSkill, setHoveredSkill] = useState(null);
@@ -29,24 +43,30 @@ const Marquee = () => {
 
   const repeatedSkills = [...skills, ...skills, ...skills, ...skills, ...skills, ...skills, ...skills, ...skills];
 
+  /* Constant slow drift, deliberately NOT coupled to scroll velocity — that
+     read as the strip lurching every time the page moved. Frame-time based so
+     it is the same speed on any refresh rate. 0.85%/s ≈ one full loop a minute. */
+  const baseX = useMotionValue(0);
+  const x = useTransform(baseX, (v) => `${wrap(-50, 0, v)}%`);
+
+  useAnimationFrame((t, delta) => {
+    baseX.set(baseX.get() - 0.85 * (Math.min(delta, 50) / 1000));
+  });
+
   return (
-    <div className="relative w-full bg-pink-600/10 py-8 overflow-hidden flex whitespace-nowrap border-y border-pink-500/20 -rotate-2 scale-110 my-16 z-20 shadow-[0_0_50px_rgba(236,72,153,0.1)] group">
+    <div className="relative w-full overflow-hidden flex whitespace-nowrap border-y border-white/[0.08] bg-white/[0.015] py-9 my-20 z-20 group">
       
-      {/* Floating Icon */}
+      {/* Hovering a skill says where it is actually used, not a floating emoji */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[10000] text-[8rem] drop-shadow-[0_0_40px_rgba(255,255,255,0.4)]"
-        style={{ x: springX, y: springY, translateX: "-50%", translateY: "-100%" }}
-        animate={{ opacity: hoveredSkill ? 1 : 0, scale: hoveredSkill ? 1 : 0.5, rotate: hoveredSkill ? 10 : -10 }}
-        transition={{ duration: 0.2 }}
+        className="fixed top-0 left-0 pointer-events-none z-[10000] rounded-full border border-white/12 bg-[#0C0C0E]/95 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-gray-300 shadow-e2 backdrop-blur-md"
+        style={{ x: springX, y: springY, translateX: "-50%", translateY: "-160%" }}
+        animate={{ opacity: hoveredSkill ? 1 : 0, y: hoveredSkill ? 0 : 8 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
       >
-        {hoveredSkill?.icon}
+        {hoveredSkill?.note}
       </motion.div>
 
-      <motion.div
-        className="flex"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-      >
+      <motion.div className="flex will-change-transform" style={{ x }}>
         {repeatedSkills.map((skill, idx) => (
           <div 
             key={idx} 
@@ -54,10 +74,10 @@ const Marquee = () => {
             onMouseEnter={() => setHoveredSkill(skill)}
             onMouseLeave={() => setHoveredSkill(null)}
           >
-            <span className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 hover:text-white transition-colors duration-300 cursor-default">
+            <span className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white/25 transition-colors duration-500 hover:text-white cursor-default">
               {skill.name}
             </span>
-            <span className="text-4xl sm:text-5xl md:text-6xl text-pink-500/50 mx-4">•</span>
+            <span className="mx-6 text-4xl text-white/12 sm:text-5xl md:text-6xl">/</span>
           </div>
         ))}
       </motion.div>

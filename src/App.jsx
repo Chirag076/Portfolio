@@ -12,7 +12,6 @@ import ContextMenu from "./components/ContextMenu";
 import SoundEngine from "./components/SoundEngine";
 import SnakeGame from "./components/SnakeGame";
 import SecretsGuide from "./components/SecretsGuide";
-import ScrollProgress from "./components/ScrollProgress";
 import TerminalConsole from "./components/TerminalConsole";
 import ResumeViewer from "./components/ResumeViewer";
 import Maintenance from "./components/Maintenance";
@@ -56,14 +55,26 @@ const App = () => {
 
     // EASTER EGG KEYBOARD LISTENER
     let typedStr = "";
+    /* e.key is undefined for some synthetic keydowns — Chrome autofill and IME
+       composition both fire them — which crashed both easter-egg listeners.
+       And neither should be listening at all while someone is typing into a
+       field: filling in the contact form was feeding the confetti trigger. */
+    const isTyping = (e) => {
+      const t = e.target;
+      if (!t) return false;
+      const tag = (t.tagName || "").toLowerCase();
+      return tag === "input" || tag === "textarea" || tag === "select" || t.isContentEditable;
+    };
+
     const handleKeyDown = (e) => {
+      if (typeof e.key !== "string" || isTyping(e)) return;
       typedStr += e.key.toLowerCase();
       if (typedStr.includes("hireme") || typedStr.includes("magic")) {
         confetti({
           particleCount: 200,
           spread: 100,
           origin: { y: 0.6 },
-          colors: ['#ec4899', '#8b5cf6', '#f97316']
+          colors: ['#E45496', '#8663E4', '#EF7B2D']
         });
         typedStr = ""; // reset
       }
@@ -73,19 +84,19 @@ const App = () => {
       }
     };
     const handleTerminal = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if (typeof e.key !== "string") return;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setShowTerminal(prev => !prev);
       }
     };
-
-    window.addEventListener("keydown", handleTerminal);
 
     // KONAMI CODE LISTENER
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let konamiIndex = 0;
 
     const handleKonami = (e) => {
+      if (typeof e.key !== "string" || isTyping(e)) return;
       if (e.key === konamiCode[konamiIndex] || e.key.toLowerCase() === konamiCode[konamiIndex]) {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
@@ -117,7 +128,6 @@ const App = () => {
 
   return (
     <SmoothScroll>
-      <ScrollProgress />
       <Preloader />
       <ContextMenu />
       <SoundEngine />

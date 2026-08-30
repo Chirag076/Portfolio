@@ -30,8 +30,8 @@ const Experience = () => {
       transition={{ duration: 1.4 }}
       className="absolute inset-0 font-extrabold text-6xl sm:text-6xl md:text-[8rem] lg:text-[10rem] xl:text-[13rem]"
       style={{
-        WebkitTextStroke: "2px white",
-        color: "black",
+        WebkitTextStroke: "2px rgba(255,255,255,0.5)",
+        color: "transparent",
       }}
     >
       EXPERIENCE
@@ -44,12 +44,7 @@ const Experience = () => {
       viewport={{ once: true, amount: 0.9 }}
       transition={{ duration: 1.4, delay: 0.4 }}
       className="relative font-extrabold text-6xl sm:text-6xl md:text-[8rem] lg:text-[11rem] xl:text-[14rem]"
-      style={{
-        backgroundImage: "linear-gradient(to right, #ec4899, #8b5cf6, #f97316)",
-        backgroundClip: "text",
-        WebkitBackgroundClip: "text",
-        color: "transparent",
-      }}
+      style={{ color: "#EDEAE4" }}
     >
       EXPERIENCE
     </motion.h1>
@@ -66,12 +61,12 @@ const Experience = () => {
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="relative group bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-[2px] rounded-3xl hover:shadow-[0_0_35px_rgba(255,255,255,0.2)] transition-all duration-500"
+            className="relative group bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-[2px] rounded-panel hover:shadow-[0_0_35px_rgba(255,255,255,0.2)] transition-all duration-500"
           >
-            <div className="bg-black rounded-3xl p-8 md:p-10 h-full">
+            <div className="bg-black rounded-panel p-8 md:p-10 h-full">
               {/* Gradient border glow */}
               <div
-                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 bg-gradient-to-r ${exp.glow} blur-[60px] rounded-3xl -z-10`}
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 bg-gradient-to-r ${exp.glow} blur-[60px] rounded-panel -z-10`}
               ></div>
 
               <motion.h3

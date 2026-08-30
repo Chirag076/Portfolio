@@ -1,10 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import Parallax from "./Parallax";
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
 import BlurText from "./BlurText";
 import { usePortfolio } from "../context/PortfolioContext";
 import ScrambleText from "./ScrambleText";
+import ProjectModal from "./ProjectModal";
 
-const ProjectCard = ({ project, index }) => {
+const ProjectCard = ({ project, index, total, onOpen }) => {
   const cardRef = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -20,6 +22,16 @@ const ProjectCard = ({ project, index }) => {
     offset: ["start end", "end start"]
   });
   const imageY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+
+  // Scroll-linked recede: as the next card rides up over this one it settles
+  // back rather than simply being covered.
+  const { scrollYProgress: pinP } = useScroll({
+    target: cardRef,
+    offset: ["start 14%", "end 14%"],
+  });
+  const isLast = index === total - 1;
+  const pinScale = useTransform(pinP, [0, 1], isLast ? [1, 1] : [1, 0.9]);
+  const pinOpacity = useTransform(pinP, [0, 1], isLast ? [1, 1] : [1, 0.4]);
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
@@ -48,16 +60,18 @@ const ProjectCard = ({ project, index }) => {
       style={{
         rotateX,
         rotateY,
+        scale: pinScale,
+        opacity: pinOpacity,
+        position: "sticky",
+        top: `calc(6rem + ${index * 14}px)`,
+        zIndex: index + 1,
         transformStyle: "preserve-3d",
         perspective: 1000,
-        willChange: "transform",
-        background: `radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(236, 72, 153, 0.08), transparent 40%), #151515`
+        willChange: "transform, opacity",
+        backfaceVisibility: "hidden",
+        background: `radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(228, 84, 150, 0.10), transparent 40%), linear-gradient(180deg, #16161A 0%, #101013 100%)`
       }}
-      initial={{ opacity: 0, y: 150 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.6 }}
-      transition={{ duration: 0.8, delay: index * 0.3 }}
-      className="flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 md:gap-10 rounded-3xl p-6 sm:p-8 md:p-10 lg:p-14 transition-colors duration-500 border border-white/5 hover:border-white/10"
+      className="light-catch flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 md:gap-10 rounded-panel p-6 sm:p-8 md:p-10 lg:p-14 transition-colors duration-500 border border-white/[0.07] hover:border-white/[0.14] shadow-e3"
     >
       {/* Project Image */}
       <div className="w-full md:w-1/3 rounded-2xl overflow-hidden border-2 sm:border-4 border-white/30">
@@ -93,28 +107,27 @@ const ProjectCard = ({ project, index }) => {
         </motion.p>
 
         {/* Shiny Gradient Button */}
-        <motion.a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
+        <motion.button
+          onClick={() => onOpen(project)}
           style={{ transform: "translateZ(20px)" }}
           className="relative inline-block text-lg sm:text-xl font-extrabold uppercase text-white px-8 py-3 rounded-full
        -translate-y-1 transition-all duration-500 ease-out border-[4px] border-transparent overflow-hidden
        hover:-translate-x-[6px] hover:translate-y-[8px] hover:rotate-[-2deg]
-       hover:shadow-[12px_12px_40px_rgba(190,100,255,0.8)] hover:border-white"
+       hover:shadow-[12px_12px_40px_rgba(239,123,45,0.8)] hover:border-white"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.95 }}
         >
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-pink-600 via-purple-600 to-orange-500"></span>
           <span className="absolute inset-0 rounded-full border-[2px] border-purple-300 pointer-events-none"></span>
-          <span className="relative z-10">View Project</span>
-        </motion.a>
+          <span className="relative z-10">Open project</span>
+        </motion.button>
       </motion.div>
     </motion.div>
   );
 };
 
 const Projects = () => {
+  const [open, setOpen] = useState(null);
   const { projects } = usePortfolio();
 
   return (
@@ -123,6 +136,7 @@ const Projects = () => {
       className="relative w-full bg-black text-white py-24 flex flex-col items-center overflow-hidden"
     >
       {/* Heading */}
+      <Parallax y={[54, -54]} x={[-26, 26]}>
       <div className="relative inline-block mb-12 z-10 text-center">
         {/* Stroke Layer */}
         <motion.h1
@@ -145,7 +159,7 @@ const Projects = () => {
           className="relative font-extrabold text-5xl sm:text-6xl md:text-[8rem] lg:text-[11rem] xl:text-[14rem]"
           style={{
             backgroundImage:
-              "linear-gradient(to right, #ec4899, #8b5cf6, #f97316)",
+              "linear-gradient(to right, #E45496, #8663E4, #EF7B2D)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             color: "transparent",
@@ -154,13 +168,15 @@ const Projects = () => {
           <ScrambleText text="PROJECTS" delay={400} />
         </motion.h1>
       </div>
+      </Parallax>
 
       {/* Project List */}
-      <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 w-[90%] max-w-6xl z-10" style={{ perspective: 1500 }}>
+      <div className="flex flex-col gap-8 sm:gap-10 w-[90%] max-w-6xl z-10 pb-[30vh]" style={{ perspective: 1500 }}>
         {projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
+          <ProjectCard key={project.id} project={project} index={index} total={projects.length} onOpen={setOpen} />
         ))}
       </div>
+      <ProjectModal project={open} onClose={() => setOpen(null)} />
     </section>
   );
 };

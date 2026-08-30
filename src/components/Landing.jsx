@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
+import Stats from "./Stats";
+import SectionRail from "./SectionRail";
+import ScrollStory from "./ScrollStory";
+import JourneyPath from "./JourneyPath";
 import AboutMe from "./AboutMe";
 import Services from "./Services";
 import Contact from "./Contact";
@@ -20,16 +24,22 @@ const Landing = () => {
   return (
     <div className="flex flex-col text-white min-h-screen font-sans bg-transparent relative z-0">
       <Navbar menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
-      <div className="relative flex flex-1 mt-10">
-        <Hero />
+      <SectionRail />
+      <div className="bg-black relative z-10">
+        <div className="relative flex flex-1">
+          <Hero />
+        </div>
+        <Stats />
+        <AboutMe />
+        <Services />
+        <ScrollStory />
+        <Marquee />
+        <JourneyPath />
+        <Experience />
+        <SpotlightSection />
+        <Projects />
+        <Reviews />
       </div>
-      <AboutMe />
-      <Services />
-      <Marquee />
-      <Experience />
-      <SpotlightSection />
-      <Projects />
-      <Reviews />
       
       {/* Contact Section acting as the final solid block */}
       <div className="bg-black relative z-10 rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.8)] pb-10">

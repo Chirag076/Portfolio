@@ -23,15 +23,33 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { text, author = "Anonymous Visitor" } = req.body;
-      
-      if (!text || text.length > 200) {
-        return res.status(400).json({ error: "Message too long or empty (max 200 chars)" });
+      /* The contact form posts { name, email, message }. This handler used to
+         accept only { text, author } and rejected anything else with a 400,
+         so every submission from the site failed. Both shapes work now. */
+      const body = req.body || {};
+      const name = (body.name || body.author || "Anonymous Visitor").toString().trim();
+      const email = (body.email || "").toString().trim();
+      const message = (body.message || body.text || "").toString().trim();
+
+      if (!message) {
+        return res.status(400).json({ error: "Message is empty" });
+      }
+      if (message.length > 4000) {
+        return res.status(400).json({ error: "Message too long (max 4000 characters)" });
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "That email address doesn't look right" });
       }
 
       const newMessage = {
-        text,
-        author,
+        name,
+        email,
+        message,
+        /* kept so the existing admin dashboard, which reads text/author,
+           keeps rendering without a change */
+        text: message,
+        author: name,
+        read: false,
         createdAt: new Date(),
       };
 

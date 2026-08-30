@@ -1,160 +1,191 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { Terminal } from "lucide-react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { Terminal, Sparkles } from "lucide-react";
+import { motion, useScroll, useMotionValueEvent, useSpring, AnimatePresence } from "framer-motion";
 import Magnetic from "./Magnetic";
 import LocalTime from "./LocalTime";
 import { usePortfolio } from "../context/PortfolioContext";
 
+const LINKS = [
+  { id: "about", label: "About" },
+  { id: "services", label: "Services" },
+  { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "contact", label: "Contact" },
+];
+
 const Navbar = ({ menuOpen, toggleMenu, closeMenu }) => {
-  const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
-  const [atTop, setAtTop] = useState(true);
+  const { scrollY, scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState(null);
   const { setShowSecrets, setShowResume, setShowTerminal } = usePortfolio();
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious();
-    // User requested to ONLY hide when scrolling UP.
-    if (latest < previous && latest > 150) {
-      setHidden(true);
-    } else {
-      setHidden(false);
-    }
-    setAtTop(latest < 50);
-  });
+  useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 40));
 
-  const handleNavClick = (e, link) => {
-    if (link.id === "resume") {
-      e.preventDefault();
-      setShowResume(true);
-      if (closeMenu) closeMenu();
-      return;
-    }
-    
-    if (link.external) return; // Let default anchor behavior handle it
-    
+  /* which section is under the top third of the viewport */
+  useEffect(() => {
+    const ids = LINKS.map((l) => l.id);
+    const onScroll = () => {
+      let current = null;
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top <= window.innerHeight * 0.35 && r.bottom >= window.innerHeight * 0.35) {
+          current = id;
+        }
+      }
+      setActive(current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const go = (e, link) => {
     e.preventDefault();
     const section = document.getElementById(link.id);
     if (section) {
-      const top = section.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
-        top: top - 80, // 80px offset for the fixed navbar
-        behavior: "smooth"
+        top: section.getBoundingClientRect().top + window.scrollY - 96,
+        behavior: "smooth",
       });
     }
     if (closeMenu) closeMenu();
   };
 
-  const links = [
-    { id: "about", label: "About" },
-    { id: "services", label: "Services" },
-    { id: "projects", label: "Projects" },
-    { id: "contact", label: "Contact" },
-    { id: "resume", label: "Resume" },
-  ];
-
   return (
-    <motion.nav
-      variants={{
-        visible: { y: 0 },
-        hidden: { y: "-100%" },
-      }}
-      animate={hidden ? "hidden" : "visible"}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-      className={`fixed top-0 left-0 right-0 flex justify-between items-center px-6 sm:px-8 py-3 sm:py-2 z-[90] transition-colors duration-300 ${atTop ? "bg-transparent" : "bg-black/40 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-white/10"
-        }`}
-    >
-      {/* Logo */}
-      <Magnetic intensity={0.1}>
-        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img
-            src="./logo2.png"
-            alt="Logo"
-            className="h-16 sm:h-14 md:h-16 lg:h-20 w-auto transition-all duration-300"
-          />
-        </button>
-      </Magnetic>
-
-      {/* Desktop Nav */}
-      <div className="hidden md:flex items-center space-x-6 lg:space-x-10 text-xs lg:text-sm font-bold tracking-widest uppercase text-gray-400">
-        {links.map(link => (
-          <Magnetic intensity={0.2} key={link.id}>
-            <a
-              href={link.external ? link.url : `#${link.id}`}
-              target={link.external ? "_blank" : "_self"}
-              rel={link.external ? "noopener noreferrer" : ""}
-              className="hover:text-white transition-colors cursor-pointer relative group"
-              onClick={(e) => handleNavClick(e, link)}
-            >
-              {link.label}
-              <span className="absolute -bottom-1.5 left-0 w-0 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
-            </a>
-          </Magnetic>
-        ))}
-        <div className="w-px h-5 bg-white/10 mx-2"></div>
-        <Magnetic intensity={0.2}>
-          <button
-            onClick={() => setShowTerminal(true)}
-            className="flex items-center gap-2 bg-white/5 border border-white/10 hover:border-white/30 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all"
-          >
-            <Terminal size={14} className="text-gray-400" /> TERMINAL
-          </button>
-        </Magnetic>
-        <div className="w-px h-5 bg-white/10 mx-2"></div>
-        <Magnetic intensity={0.2}>
-          <button
-            onClick={() => setShowSecrets(true)}
-            className="flex items-center gap-2 bg-pink-500/10 border border-pink-500/30 hover:border-pink-400 hover:bg-pink-500/20 text-pink-400 px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-[0_0_10px_rgba(236,72,153,0.1)]"
-          >
-            <span className="animate-pulse">✨</span> SECRETS
-          </button>
-        </Magnetic>
-      </div>
-
-      {/* Local Time Widget */}
-      <LocalTime />
-
-      {/* Mobile Menu Icon */}
-      <div
-        className={`
-          md:hidden 
-          text-2xl sm:text-3xl 
-          cursor-pointer transition-transform duration-300 transform
-          ${menuOpen ? "rotate-90 scale-110 text-blue-400" : "rotate-0"}
-        `}
-        onClick={toggleMenu}
+    <div className="fixed top-0 inset-x-0 z-[90] px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none">
+      <motion.nav
+        initial={{ y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        className="pointer-events-auto mx-auto w-full max-w-[1180px]"
       >
-        {menuOpen ? <FaTimes /> : <FaBars />}
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {menuOpen && (
-        <div
-          className="
-            absolute top-full left-0 w-full bg-black/95 backdrop-blur-xl 
-            flex flex-col items-center space-y-8 py-10 
-            text-3xl font-extrabold tracking-wider 
-            md:hidden z-50 border-b border-white/10
-          "
+        <motion.div
+          animate={{
+            backgroundColor: scrolled ? "rgba(8,8,10,0.72)" : "rgba(255,255,255,0.03)",
+            borderColor: scrolled ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.07)",
+            paddingTop: scrolled ? 10 : 14,
+            paddingBottom: scrolled ? 10 : 14,
+          }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="relative flex items-center justify-between gap-3 rounded-full border px-3 sm:px-4 backdrop-blur-2xl overflow-hidden"
+          style={{ boxShadow: "0 20px 50px -24px rgba(0,0,0,0.9)" }}
         >
-          {links.map(link => (
-            <a
-              key={link.id}
-              href={link.external ? link.url : `#${link.id}`}
-              target={link.external ? "_blank" : "_self"}
-              rel={link.external ? "noopener noreferrer" : ""}
-              onClick={(e) => handleNavClick(e, link)}
-              className="hover:text-blue-400 transition cursor-pointer"
-            >
-              {link.label}
-            </a>
-          ))}
-          {/* Secrets hidden on mobile per user request */}
-        </div>
-      )}
+          {/* top hairline highlight */}
+          <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
-    </motion.nav>
+          {/* reading progress, hugging the capsule */}
+          <motion.span
+            style={{ scaleX: progress }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 opacity-70"
+          />
+
+          {/* wordmark */}
+          <Magnetic intensity={0.15}>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="flex items-center gap-2 pl-3 pr-1 text-[18px] font-bold tracking-[-0.02em] text-white"
+            >
+              Chirag
+              <span className="h-[7px] w-[7px] rounded-full bg-gradient-to-r from-pink-500 to-orange-500" />
+            </button>
+          </Magnetic>
+
+          {/* centre links with sliding indicator */}
+          <div className="hidden md:flex items-center gap-0.5">
+            {LINKS.map((link) => {
+              const on = active === link.id;
+              return (
+                <a
+                  key={link.id}
+                  href={`#${link.id}`}
+                  onClick={(e) => go(e, link)}
+                  className={`relative rounded-full px-3.5 lg:px-4 py-2 text-[13.5px] font-medium tracking-[0.01em] transition-colors duration-300 ${
+                    on ? "text-white" : "text-gray-400 hover:text-gray-200"
+                  }`}
+                >
+                  {on && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      className="absolute inset-0 rounded-full bg-white/[0.08] border border-white/10"
+                    />
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                </a>
+              );
+            })}
+          </div>
+
+          {/* right cluster */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="hidden xl:block"><LocalTime /></div>
+
+            <button
+              onClick={() => setShowTerminal(true)}
+              title="Terminal (⌘K)"
+              className="hidden sm:grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-gray-300 transition-all duration-300 hover:text-white hover:border-white/25 hover:bg-white/[0.08]"
+            >
+              <Terminal size={16} />
+            </button>
+
+            <button
+              onClick={() => setShowSecrets(true)}
+              title="Secrets"
+              className="hidden sm:grid h-10 w-10 place-items-center rounded-full border border-pink-500/25 bg-pink-500/[0.08] text-pink-400 transition-all duration-300 hover:border-pink-400/60 hover:bg-pink-500/15"
+            >
+              <Sparkles size={16} className="animate-pulse" />
+            </button>
+
+            <Magnetic intensity={0.15}>
+              <button
+                onClick={() => setShowResume(true)}
+                className="group relative overflow-hidden rounded-full px-6 sm:px-7 py-2.5 text-[13.5px] font-bold tracking-[0.01em] text-white shadow-e2 transition-transform duration-300 hover:-translate-y-[2px]"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-orange-500" />
+                <span className="absolute inset-0 translate-y-full bg-white/20 transition-transform duration-500 ease-out group-hover:translate-y-0" />
+                <span className="relative z-10">Resume</span>
+              </button>
+            </Magnetic>
+
+            <button
+              className="md:hidden grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-white"
+              onClick={toggleMenu}
+            >
+              {menuOpen ? <FaTimes size={14} /> : <FaBars size={14} />}
+            </button>
+          </div>
+        </motion.div>
+
+        {/* mobile sheet */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="md:hidden mt-2 rounded-3xl border border-white/10 bg-black/85 backdrop-blur-2xl p-3"
+            >
+              {LINKS.map((link) => (
+                <a
+                  key={link.id}
+                  href={`#${link.id}`}
+                  onClick={(e) => go(e, link)}
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+    </div>
   );
 };
 
-export default React.memo(Navbar);
+export default Navbar;

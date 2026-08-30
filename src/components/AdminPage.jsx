@@ -56,7 +56,7 @@ const AdminLogin = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2 }}
-        className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(236,72,153,0.2),_transparent_40%),_radial-gradient(circle_at_bottom_right,_rgba(139,92,246,0.2),_transparent_45%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(228,84,150,0.2),_transparent_40%),_radial-gradient(circle_at_bottom_right,_rgba(134,99,228,0.2),_transparent_45%)]"
       />
 
       {/* Pulse Rings */}
@@ -153,7 +153,7 @@ const AdminLogin = () => {
               translateX: -6,
               translateY: 8,
               rotate: -1,
-              boxShadow: "15px 15px 40px rgba(190,100,255,0.6)",
+              boxShadow: "15px 15px 40px rgba(239,123,45,0.6)",
             }}
             whileTap={{ scale: 0.95 }}
             type="submit"

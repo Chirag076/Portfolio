@@ -813,7 +813,7 @@ const AdminDashboard = () => {
             <button 
               onClick={handleSaveAll}
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:scale-105 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)] disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:scale-105 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(228,84,150,0.3)] disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
               SAVE LIVE

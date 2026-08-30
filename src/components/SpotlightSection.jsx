@@ -57,7 +57,7 @@ const SpotlightSection = () => {
           y: springY,
           translateX: "-50%",
           translateY: "-50%",
-          background: "radial-gradient(circle, rgba(236,72,153,0.15) 0%, rgba(0,0,0,0) 70%)",
+          background: "radial-gradient(circle, rgba(228,84,150,0.15) 0%, rgba(0,0,0,0) 70%)",
         }}
       />
       

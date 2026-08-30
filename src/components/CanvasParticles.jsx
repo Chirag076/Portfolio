@@ -19,6 +19,15 @@ const CanvasParticles = () => {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    /* Only run while the canvas is actually on screen. It used to animate for
+       the entire length of the page, competing with every scroll scene. */
+    let visible = true;
+    const io = new IntersectionObserver(
+      ([e]) => { visible = e.isIntersecting; },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+
     const mouse = { x: null, y: null, radius: isMobile ? 80 : 120 };
 
     const handleMouseMove = (e) => {
@@ -26,7 +35,7 @@ const CanvasParticles = () => {
       mouse.y = e.y;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
     class Particle {
       constructor(x, y, directionX, directionY, size, color) {
@@ -101,7 +110,7 @@ const CanvasParticles = () => {
           
           if (distanceSq < maxDistance) {
             let opacity = 1 - distanceSq / maxDistance;
-            ctx.strokeStyle = `rgba(236, 72, 153, ${opacity * 0.1})`;
+            ctx.strokeStyle = `rgba(228, 84, 150, ${opacity * 0.1})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[a].x, particles[a].y);
@@ -114,6 +123,7 @@ const CanvasParticles = () => {
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (!visible || document.hidden) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
@@ -128,6 +138,7 @@ const CanvasParticles = () => {
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animationFrameId);
+      io.disconnect();
     };
   }, []);
 

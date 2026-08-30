@@ -45,7 +45,7 @@ const ContactCard = () => {
           rotateY,
           transformStyle: "preserve-3d",
         }}
-        className="relative w-full max-w-sm aspect-[3/4] rounded-3xl bg-white/5 backdrop-blur-xl border border-white/20 p-8 flex flex-col justify-between shadow-[0_20px_50px_rgba(236,72,153,0.2)] cursor-crosshair overflow-hidden hover:border-pink-500/50 transition-colors duration-500"
+        className="relative w-full max-w-sm aspect-[3/4] rounded-panel bg-white/[0.045] border border-white/[0.10] p-8 flex flex-col justify-between shadow-e3 cursor-crosshair overflow-hidden hover:border-pink-500/50 transition-colors duration-500"
       >
         {/* Dynamic Glare */}
         <motion.div
@@ -68,13 +68,13 @@ const ContactCard = () => {
 
         {/* Bottom Socials */}
         <div className="relative z-10 flex flex-col gap-4" style={{ transform: "translateZ(40px)" }}>
-          <a href={socialLinks.email} className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors bg-black/40 p-4 rounded-xl border border-white/10 hover:border-pink-500/50 backdrop-blur-md group">
+          <a href={socialLinks.email} className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors bg-white/[0.03] p-4 rounded-card border border-white/[0.09] hover:border-pink-500/50 group">
             <Mail size={20} className="group-hover:scale-110 transition-transform text-pink-400" />
             <span className="font-mono text-[10px] sm:text-sm truncate">{socialLinks.email.replace('mailto:', '')}</span>
           </a>
 
           <div className="flex gap-4 mt-2">
-            <a href={socialLinks.github} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 hover:shadow-[0_0_20px_rgba(236,72,153,0.5)] transition-all group">
+            <a href={socialLinks.github} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 hover:shadow-[0_0_20px_rgba(228,84,150,0.5)] transition-all group">
               <Github size={20} className="text-gray-300 group-hover:text-white transition-colors" />
             </a>
             <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] transition-all group">

@@ -26,10 +26,10 @@ const LocalTime = () => {
   }, []);
 
   return (
-    <div className="hidden xl:flex items-center gap-2 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-[0_0_20px_rgba(255,255,255,0.05)] cursor-default">
-      <span>📍 {location}</span>
-      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-2 mr-1"></span>
-      <span className="text-white tracking-widest w-[100px] text-center">{time}</span>
+    <div className="hidden xl:flex items-center gap-2.5 whitespace-nowrap text-[12.5px] font-medium tracking-wide text-gray-400 bg-white/[0.04] border border-white/10 px-4 py-2 rounded-full backdrop-blur-md cursor-default">
+      <span>{location}</span>
+      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+      <span className="text-gray-200 tabular-nums">{time}</span>
     </div>
   );
 };

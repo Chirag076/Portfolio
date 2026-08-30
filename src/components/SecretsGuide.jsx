@@ -9,7 +9,7 @@ const SecretsGuide = ({ onClose }) => {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-3xl bg-[#0D1117] border border-gray-800 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(236,72,153,0.15)]"
+        className="relative w-full max-w-3xl bg-[#0D1117] border border-gray-800 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(228,84,150,0.15)]"
       >
         {/* Header */}
         <div className="bg-[#161B22] border-b border-gray-800 px-6 py-4 flex items-center">

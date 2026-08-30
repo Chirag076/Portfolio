@@ -3,11 +3,20 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 const defaultProjects = [
   {
     id: "01",
-    title: "🗨️ Talksy – Fullstack Chat App",
-    description: "A real-time chat application built with React, Node.js, and MongoDB. Features secure authentication, responsive UI, and 1-to-1 messaging with Zustand state management.",
+    title: "Market-Exchange",
+    description:
+      "A trading exchange modelled on the Binance API, serving mock local pairs alongside live pairs proxied from Backpack. Orders match in a single-node in-memory engine \u2014 5,000 a second at sub-5ms \u2014 while durability stays off the hot path through 3-second snapshots and a Redis replay queue.",
+    image: "/images/market-exchange.png",
+    link: "https://github.com/Chirag076/market-exchange-project",
+  },
+  {
+    id: "02",
+    title: "Talksy",
+    description:
+      "Real-time messaging with instant delivery, typing indicators, presence and persistent history. The interesting work was the state layer \u2014 restructured so an incoming message re-renders the conversation you are reading, not the entire list behind it.",
     image: "/images/talksy.png",
     link: "https://github.com/Chirag076/Talksy",
-  }
+  },
 ];
 
 const defaultServices = [
@@ -31,22 +40,34 @@ const defaultServices = [
 const defaultExperience = [
   {
     id: 1,
-    role: "Software Developer intern",
-    company: "UnQue",
-    duration: "Jul 2025 – Present",
-    description: "Fixed bugs and implemented new APIs and features, ensuring smooth functionality and system reliability. Focused on deployment efficiency, code quality, and optimizing performance across applications.",
-    tech: ["React", "TypeScript", "TailwindCSS", "Node.js", "MongoDB"],
+    role: "Full Stack Engineering Intern",
+    company: "Rocket Health",
+    duration: "Aug 2026 \u2013 Present",
+    description:
+      "Replaced 6 per-product API calls and 7 client transformers with a single endpoint, cutting 450 lines and a manual per-environment step that left new environments rendering blank. Built a slot-expiry countdown with auto-cancellation in the React Native checkout, covered by Jest unit tests.",
+    tech: ["NestJS", "Prisma", "PostgreSQL", "React Native", "TanStack Query"],
     glow: "from-pink-500 via-purple-500 to-orange-400",
   },
   {
     id: 2,
-    role: "Software Developer intern",
+    role: "Software Developer",
+    company: "UnQue",
+    duration: "Jul 2025 \u2013 Aug 2026",
+    description:
+      "Shipped booking, referrals, attendance tracking, analytics and role-based access for a salon platform serving 40 businesses and 10,000 appointments a month. Eliminated a double-booking race with a unique database constraint, and cut releases from a manual 40 minutes to 5 with Docker and automated AWS deploys.",
+    tech: ["Node.js", "MongoDB", "React", "Docker", "AWS"],
+    glow: "from-purple-500 via-pink-500 to-orange-400",
+  },
+  {
+    id: 3,
+    role: "Software Developer Intern",
     company: "OPM Corporation",
-    duration: "Jul 2025 – Oct 2025",
-    description: "Built responsive and interactive user interfaces using React, TypeScript, and TailwindCSS. Focused on performance, accessibility, and delivering a consistent user experience across web platforms.",
-    tech: ["React", "TypeScript", "TailwindCSS", "Node.js", "MongoDB"],
-    glow: "from-orange-400 via-yellow-400 to-pink-500",
-  }
+    duration: "Jul 2025 \u2013 Oct 2025",
+    description:
+      "Delivered three flows end to end from Figma designs \u2014 authentication, profile management and reporting \u2014 as responsive React interfaces, and extracted shared UI into reusable components adopted across later features.",
+    tech: ["React", "TypeScript", "TailwindCSS"],
+    glow: "from-orange-400 via-pink-500 to-purple-500",
+  },
 ];
 
 const defaultSocialLinks = {

@@ -86,7 +86,7 @@ const CustomCursor = () => {
           cy="0"
           r="22"
           fill="none"
-          stroke="rgba(236, 72, 153, 0.5)"
+          stroke="rgba(228, 84, 150, 0.5)"
           strokeWidth="2"
           style={{
             x: cursorX,

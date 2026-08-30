@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Parallax from "./Parallax";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePortfolio } from "../context/PortfolioContext";
 import { RotateCcw } from "lucide-react";
@@ -32,7 +33,7 @@ const ServiceCard = ({ service, index, isMobile, handleClose }) => {
       style={{
         background: `radial-gradient(400px circle at var(--sx, 50%) var(--sy, 50%), rgba(255,255,255,0.06), transparent 80%)`
       }}
-      className="flex flex-col bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.05)] cursor-grab active:cursor-grabbing transition-colors duration-300 hover:border-pink-500/30"
+      className="flex flex-col bg-white/5 backdrop-blur-xl border border-white/[0.08] text-white rounded-card overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.05)] cursor-grab active:cursor-grabbing transition-colors duration-300 hover:border-pink-500/30"
     >
       {/* macOS Window Header */}
       <div className="w-full bg-black/40 border-b border-white/10 px-4 py-3 flex items-center gap-2">
@@ -94,6 +95,7 @@ const Services = () => {
       className="relative w-full bg-black text-white py-24 flex flex-col items-center overflow-hidden"
     >
       {/* Heading */}
+      <Parallax y={[54, -54]} x={[-26, 26]}>
       <div className="relative inline-block mb-10 md:mb-20 z-10 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 50, scale: 0.8 }}
@@ -101,7 +103,7 @@ const Services = () => {
           viewport={{ once: true, amount: 0.9 }}
           transition={{ duration: 1.4 }}
           className="absolute inset-0 font-extrabold text-5xl sm:text-6xl md:text-[8rem] lg:text-[10rem] xl:text-[13rem] text-white"
-          style={{ WebkitTextStroke: "2px white", color: "black" }}
+          style={{ WebkitTextStroke: "2px rgba(255,255,255,0.5)", color: "transparent" }}
         >
           <ScrambleText text="SERVICES" />
         </motion.h1>
@@ -112,16 +114,12 @@ const Services = () => {
           viewport={{ once: true, amount: 0.9 }}
           transition={{ duration: 1.4, delay: 0.4 }}
           className="relative font-extrabold text-5xl sm:text-6xl md:text-[8rem] lg:text-[11rem] xl:text-[14rem]"
-          style={{
-            backgroundImage: "linear-gradient(to right, #ec4899, #8b5cf6, #f97316)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-          }}
+          style={{ color: "#EDEAE4" }}
         >
           <ScrambleText text="SERVICES" delay={400} />
         </motion.h1>
       </div>
+      </Parallax>
 
       <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 w-[90%] max-w-6xl z-10">
         <AnimatePresence>
@@ -146,7 +144,7 @@ const Services = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             onClick={handleRestore}
-            className="mt-12 flex items-center gap-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 px-6 py-2 rounded-full text-pink-400 font-bold transition-all shadow-[0_0_15px_rgba(236,72,153,0.2)] z-10"
+            className="mt-12 flex items-center gap-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 px-6 py-2 rounded-full text-pink-400 font-bold transition-all shadow-[0_0_15px_rgba(228,84,150,0.2)] z-10"
           >
             <RotateCcw size={18} />
             RESTORE CLOSED WINDOWS

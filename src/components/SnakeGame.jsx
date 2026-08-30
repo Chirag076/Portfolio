@@ -85,7 +85,7 @@ const SnakeGame = ({ onClose }) => {
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="relative bg-gray-900 border-4 border-pink-500 rounded-xl p-8 shadow-[0_0_50px_rgba(236,72,153,0.5)] flex flex-col items-center"
+        className="relative bg-gray-900 border-4 border-pink-500 rounded-xl p-8 shadow-[0_0_50px_rgba(228,84,150,0.5)] flex flex-col items-center"
       >
         <button
           onClick={onClose}
