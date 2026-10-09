@@ -1,20 +1,37 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  darkMode: "class",
   theme: {
     extend: {
+      /* Every colour is a CSS variable so the light and dark themes are one
+         stylesheet and a class flip — no second palette to keep in sync. */
       colors: {
-        /* Halfway between the original neon and a fully muted pass: keeps the
-           punch, loses the vibration. Hues untouched. */
-        pink:   { 400: "#EC7EAE", 500: "#E45496", 600: "#CF3979" },
-        purple: { 400: "#A48FED", 500: "#8663E4", 600: "#7546D9" },
-        orange: { 400: "#F5994F", 500: "#EF7B2D", 600: "#DC621E" },
+        canvas: "var(--canvas)",
+        "canvas-2": "var(--canvas-2)",
+        surface: "var(--surface)",
+        ink: "var(--ink)",
+        "ink-2": "var(--ink-2)",
+        "ink-3": "var(--ink-3)",
+        line: "var(--line)",
+        "line-2": "var(--line-2)",
+        accent: "var(--accent)",
+        "accent-ink": "var(--accent-ink)",
+        up: "var(--up)",
+        down: "var(--down)",
+        "up-text": "var(--up-text)",
+        "down-text": "var(--down-text)",
       },
-      borderRadius: { card: "18px", panel: "26px" },
-      boxShadow: {
-        e1: "0 1px 2px rgba(0,0,0,.55), 0 4px 12px -4px rgba(0,0,0,.5)",
-        e2: "0 2px 4px rgba(0,0,0,.6), 0 12px 28px -10px rgba(0,0,0,.65), 0 40px 80px -40px rgba(0,0,0,.8)",
-        e3: "0 4px 8px rgba(0,0,0,.65), 0 24px 50px -18px rgba(0,0,0,.7), 0 70px 120px -60px rgba(0,0,0,.9)",
+      fontFamily: {
+        sans: ["Geist", "Geist Fallback", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["Geist Mono", "Geist Mono Fallback", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        serif: ["Instrument Serif", "Instrument Serif Fallback", "Iowan Old Style", "Times New Roman", "serif"],
+      },
+      transitionTimingFunction: {
+        expo: "cubic-bezier(.16, 1, .3, 1)",
+      },
+      maxWidth: {
+        wrap: "1680px",
       },
     },
   },

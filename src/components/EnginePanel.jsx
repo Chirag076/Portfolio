@@ -1,58 +1,47 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { OrderBook, makeOrder, mulberry32 } from "../lib/matchingEngine";
 
-/* The engine from Market-Exchange, actually running in the browser.
-   Every figure is measured from real work — nothing here is a timer
-   pretending to be throughput. */
+/* The engine from Market-Exchange, actually running in the browser. Every
+   figure is measured from real work — nothing here is a timer pretending to
+   be throughput. Loaded only when someone asks for it. */
 
 const fmt = (n, d = 0) =>
-  n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  n.toLocaleString("en-US", {
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
+  });
 
 const Ladder = ({ rows, side, max }) => (
   <div className="flex flex-col gap-[3px]">
     {rows.map((r, i) => (
-      <div key={i} className="relative flex h-[22px] items-center px-2 text-[11px]">
+      <div
+        key={i}
+        className="relative flex h-[22px] items-center px-2 text-[11px]"
+      >
         <div
-          className={`absolute inset-y-0 ${side === "bid" ? "right-0" : "left-0"} rounded-[2px]`}
-          style={{
-            width: `${Math.min(100, (r.qty / max) * 100)}%`,
-            background:
-              side === "bid"
-                ? "linear-gradient(90deg, rgba(34,197,94,0.03), rgba(34,197,94,0.20))"
-                : "linear-gradient(90deg, rgba(228,84,150,0.20), rgba(228,84,150,0.03))",
-          }}
+          className={`bar ${side === "bid" ? "bar-bid" : "bar-ask"}`}
+          style={{ width: `${Math.min(100, (r.qty / max) * 100)}%` }}
         />
         <span
-          className={`relative z-10 w-full font-mono tabular-nums ${
-            side === "bid" ? "text-right text-emerald-300/90" : "text-left text-pink-300/90"
-          }`}
+          className={`relative z-10 w-full font-mono tabular-nums ${side === "bid" ? "text-right text-up-text" : "text-left text-down-text"}`}
         >
           {r.price.toFixed(2)}
-          <span className="ml-3 text-gray-500">{r.qty}</span>
+          <span className="ml-3 text-ink-3">{r.qty}</span>
         </span>
       </div>
     ))}
     {rows.length === 0 && (
-      <div className="h-[22px] px-2 font-mono text-[11px] text-gray-600">—</div>
+      <div className="h-[22px] px-2 font-mono text-[11px] text-ink-3">—</div>
     )}
   </div>
 );
 
-const Readout = ({ label, value, unit, accent }) => (
+const Readout = ({ label, value, unit }) => (
   <div>
-    <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
-      {label}
-    </div>
-    <div
-      className={`mt-1.5 font-mono text-[22px] leading-none tabular-nums ${
-        accent
-          ? "bg-gradient-to-r from-pink-400 via-purple-400 to-orange-400 bg-clip-text text-transparent"
-          : "text-white"
-      }`}
-    >
+    <div className="t-mono-xs text-ink-3">{label}</div>
+    <div className="mt-1.5 font-mono text-[22px] leading-none tabular-nums text-ink">
       {value}
-      {unit && <span className="ml-1 text-[12px] text-gray-500">{unit}</span>}
+      {unit && <span className="ml-1 text-[12px] text-ink-3">{unit}</span>}
     </div>
   </div>
 );
@@ -145,51 +134,44 @@ const EnginePanel = () => {
   const maxQty = Math.max(
     1,
     ...depth.bids.map((d) => d.qty),
-    ...depth.asks.map((d) => d.qty)
+    ...depth.asks.map((d) => d.qty),
   );
 
   return (
     <div className="w-full">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gradient-to-r from-pink-500 to-orange-500" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-gray-500">
-            Running live in this window
-          </span>
+        <div className="t-mono-xs flex items-center gap-3 text-ink-3">
+          <span className="dot" aria-hidden="true" />
+          Running live in this window · price-time priority · in memory
         </div>
         <button
+          type="button"
           onClick={runBenchmark}
           disabled={running}
-          className="group relative shrink-0 overflow-hidden rounded-full px-7 py-3 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-transform duration-300 hover:-translate-y-[2px] disabled:opacity-60"
+          className="btn btn-primary t-mono disabled:opacity-60"
         >
-          <span className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-orange-500" />
-          <span className="absolute inset-0 translate-y-full bg-white/20 transition-transform duration-500 ease-out group-hover:translate-y-0" />
-          <span className="relative z-10">{running ? "Matching…" : "Benchmark it"}</span>
+          {running ? "Matching…" : "Benchmark it"}
         </button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="light-catch rounded-panel border border-white/[0.07] bg-white/[0.02] p-5">
-          <div className="mb-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="rounded-2xl border hairline bg-surface p-5">
+          <div className="t-mono-xs mb-4 flex items-center justify-between text-ink-3">
             <span>Order book</span>
             <span>{fmt(live.rate)} ord/s</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="mb-2 px-2 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-500/70">
-                Bids
-              </div>
+              <div className="t-mono-xs mb-2 px-2 text-up-text">Bids</div>
               <Ladder rows={depth.bids} side="bid" max={maxQty} />
             </div>
             <div>
-              <div className="mb-2 px-2 font-mono text-[10px] uppercase tracking-[0.16em] text-pink-500/70">
-                Asks
-              </div>
+              <div className="t-mono-xs mb-2 px-2 text-down-text">Asks</div>
               <Ladder rows={depth.asks} side="ask" max={maxQty} />
             </div>
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4">
-            <Readout label="Last" value={live.last.toFixed(2)} accent />
+          <div className="mt-5 flex items-center justify-between border-t hairline pt-4">
+            <Readout label="Last" value={live.last.toFixed(2)} />
             <Readout label="Fills" value={fmt(live.trades)} />
             <Readout
               label="Spread"
@@ -202,14 +184,14 @@ const EnginePanel = () => {
           </div>
         </div>
 
-        <div className="light-catch flex flex-col rounded-panel border border-white/[0.07] bg-white/[0.02] p-5">
-          <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+        <div className="flex flex-col rounded-2xl border hairline bg-surface p-5">
+          <div className="t-mono-xs mb-5 text-ink-3">
             Benchmark · measured on your CPU
           </div>
 
           {!bench && !running && (
             <div className="flex flex-1 items-center">
-              <p className="font-mono text-[12px] leading-relaxed text-gray-600">
+              <p className="font-mono text-[12px] leading-relaxed text-ink-3">
                 Warms the JIT with 8,000 orders, resets the book, then matches
                 50,000 fresh ones against the wall clock.
                 <br />
@@ -220,32 +202,43 @@ const EnginePanel = () => {
           )}
 
           {running && (
-            <div className="flex flex-1 items-center font-mono text-[12px] text-gray-400">
-              <span className="mr-3 inline-block h-2 w-2 animate-ping rounded-full bg-pink-500" />
+            <div className="flex flex-1 items-center font-mono text-[12px] text-ink-2">
+              <span className="dot mr-3" aria-hidden="true" />
               matching 50,000 orders…
             </div>
           )}
 
           {bench && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="grid flex-1 grid-cols-2 content-center gap-x-6 gap-y-6"
-            >
-              <Readout label="Throughput" value={fmt(bench.perSec)} unit="ord/s" accent />
-              <Readout label="Wall clock" value={bench.ms.toFixed(0)} unit="ms" />
-              <Readout label="Per order" value={bench.nsPerOrder.toFixed(0)} unit="ns" />
-              <Readout label="Fill rate" value={bench.fillRate.toFixed(1)} unit="%" />
-              <div className="col-span-2 border-t border-white/[0.07] pt-4">
+            <div className="grid flex-1 grid-cols-2 content-center gap-x-6 gap-y-6">
+              <Readout
+                label="Throughput"
+                value={fmt(bench.perSec)}
+                unit="ord/s"
+              />
+              <Readout
+                label="Wall clock"
+                value={bench.ms.toFixed(0)}
+                unit="ms"
+              />
+              <Readout
+                label="Per order"
+                value={bench.nsPerOrder.toFixed(0)}
+                unit="ns"
+              />
+              <Readout
+                label="Fill rate"
+                value={bench.fillRate.toFixed(1)}
+                unit="%"
+              />
+              <div className="col-span-2 border-t hairline pt-4">
                 <Readout label="Fills produced" value={fmt(bench.trades)} />
-                <p className="mt-3 font-mono text-[10.5px] leading-relaxed text-gray-600">
+                <p className="mt-3 font-mono text-[10.5px] leading-relaxed text-ink-3">
                   Bare matcher only. The 5,000/s on my CV is the whole system
                   under simulated traffic — network, WebSocket fan-out and
                   snapshotting included.
                 </p>
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

@@ -1,23 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="grain">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <title>Chirag Chhabra — Full-Stack Engineer · AI Agents | Booking &amp; Payments</title>
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Full-stack engineer in Delhi, India. Booking and payments at 10,000 appointments a month, a matching engine at 5,000 orders a second, and LLM agents with tool-calling and RAG. Immediate joiner."
     />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="theme-color" content="#f3f0e8" />
+    <link rel="canonical" href="https://chiragchhabra.vercel.app/" />
+    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>Chirag's Portfolio</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Chirag Chhabra — Full-Stack Engineer" />
+    <meta property="og:description" content="Booking & payments systems, a live matching engine, and LLM agents with tool-calling and RAG. Delhi, India · immediate joiner." />
+    <meta property="og:url" content="https://chiragchhabra.vercel.app/" />
+    <meta property="og:image" content="https://chiragchhabra.vercel.app/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Fonts are self-hosted: the two faces visible in the hero are fetched
+         in parallel with the app bundle, so the first paint is already in the
+         right type. The mono face loads on demand. -->
+    <link rel="preload" href="%PUBLIC_URL%/fonts/geist-latin-wght.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%PUBLIC_URL%/fonts/instrument-serif-latin-italic.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- The site opens on the light canvas by default; a visitor's toggle is
+         remembered and applied before first paint, so there is no flash. -->
+    <script>
+      (function () {
+        document.documentElement.classList.add("js");
+        try {
+          if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+            var m = document.querySelector('meta[name="theme-color"]');
+            if (m) m.setAttribute("content", "#0a0a0b");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      /* paint the canvas before the stylesheet arrives */
+      html { background: #f3f0e8; }
+      html.dark { background: #0a0a0b; }
+      /* Self-hosted type (SIL OFL). The "Fallback" faces are Arial/Times scaled to
+         Geist's and Instrument Serif's metrics, so the swap never moves the layout. */
+      @font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/fonts/geist-latin-wght.woff2) format("woff2-variations"), url(/fonts/geist-latin-wght.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; } @font-face { font-family: "Geist Fallback"; src: local("Arial"); ascent-override: 95.94%; descent-override: 28.16%; line-gap-override: 0%; size-adjust: 104.76%; } @font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/fonts/geist-mono-latin-wght.woff2) format("woff2-variations"), url(/fonts/geist-mono-latin-wght.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; } @font-face { font-family: "Geist Mono Fallback"; src: local("Arial"); ascent-override: 74.67%; descent-override: 21.92%; line-gap-override: 0%; size-adjust: 134.59%; } @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url(/fonts/instrument-serif-latin-italic.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; } @font-face { font-family: "Instrument Serif Fallback"; src: local("Times New Roman"); ascent-override: 117.94%; descent-override: 36.93%; line-gap-override: 0%; size-adjust: 83.94%; }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>Chirag Chhabra — full-stack engineer. This site needs JavaScript; you can reach me at chiragchhabrahmo@gmail.com.</noscript>
     <div id="root"></div>
   </body>
 </html>

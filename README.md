@@ -1,71 +1,40 @@
-# Getting Started with Create React App
+# chiragchhabra.vercel.app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Personal site of Chirag Chhabra — full-stack engineer (booking & payments, AI agents). Live at [chiragchhabra.vercel.app](https://chiragchhabra.vercel.app).
 
-## Available Scripts
+## What is in here
 
-In the project directory, you can run:
+- **Landing page** — `src/components/` (Nav, Hero, Work, Principles, Stack, About, Timeline, Recommendations, Contact, Footer). All copy and numbers live in `src/data/site.js`.
+- **Live matching engine** — `src/lib/matchingEngine.js` + `EnginePanel.jsx`. The order book from Market-Exchange, running in the browser; the benchmark is measured on the visitor's CPU. Loaded only when someone clicks "Run the engine live".
+- **Admin dashboard** — `/admin` (`AdminPage.jsx`, `AdminDashboard.jsx`) backed by the serverless functions in `api/` (MongoDB). Edits projects, experience, social links, maintenance mode; reads contact-form messages and recruiter analytics. Loaded only on that route.
+- **Contact form** — posts to `api/messages.mjs` and sends through EmailJS; the message counts as delivered if either lands.
 
-### `npm start`
+## Design
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Modelled on the editorial, paper-and-ink style: a cream canvas (`--canvas`) and one ink (`--ink`), hairline dividers, mono uppercase labels, big tight-tracked headlines with an italic serif phrase. Dark theme is the same stylesheet with a class flip (`.dark`), remembered in `localStorage`. Every colour is a CSS variable in `src/index.css`; Tailwind maps them to `bg-canvas`, `text-ink-2`, `border-line` and so on.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Type is self-hosted from `public/fonts` (Geist, Geist Mono, Instrument Serif — SIL OFL) with metric-matched fallback faces so the font swap never shifts the layout.
 
-### `npm test`
+## Performance
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Lighthouse 100 / 100 / 100 / 100 (mobile and desktop) is the target and the build is set up to keep it:
 
-### `npm run build`
+- `npm run build` runs `react-scripts build` and then `scripts/prerender.js`, which renders the landing page to static HTML inside `build/index.html`, inlines the stylesheet, and loads the app bundle after the first frame. React hydrates the page in place. No browser is needed for this step; it runs on plain Node with the Babel preset CRA already ships.
+- No router, no animation library, no particles on the landing page. Reveal-on-scroll is one IntersectionObserver and CSS transitions.
+- Images are WebP with explicit dimensions; fonts are preloaded; `vercel.json` sets long cache lifetimes for `/static`, `/fonts` and `/images`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Run it
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+npm start          # dev server on http://localhost:3000 (no prerender in dev)
+npm run build      # production build → build/
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The API routes need `MONGODB_URI` (and `ADMIN_PASSWORD` until a password is set in the dashboard) as environment variables on Vercel.
 
-### `npm run eject`
+## Editing content
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# Portfolio
+- Words, numbers, stack, principles, recommendations: `src/data/site.js`.
+- Projects and experience: defaults in `src/context/PortfolioContext.jsx`; the admin dashboard can edit any project by title and add new ones, but the four curated projects always show.
+- Project visuals: `public/images/<name>.webp` (1200×675) plus an optional `<name>-800.webp` for phones.

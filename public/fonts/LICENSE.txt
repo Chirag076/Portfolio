@@ -1,0 +1,4 @@
+Geist and Geist Mono — Copyright 2023 Vercel, in collaboration with basement.studio.
+Instrument Serif — Copyright 2022 The Instrument Serif Project Authors (Rodrigo Fuenzalida, Jordan Egstad).
+All three are licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+Files are the latin subsets packaged by Fontsource (https://fontsource.org).
