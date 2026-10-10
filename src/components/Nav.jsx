@@ -3,7 +3,7 @@ import { IDENTITY, NAV } from "../data/site";
 import { getTheme, toggleTheme } from "../lib/theme";
 import { usePortfolio } from "../context/PortfolioContext";
 
-const SunMoon = ({ dark }) =>
+export const SunMoon = ({ dark }) =>
   dark ? (
     <svg
       width="14"

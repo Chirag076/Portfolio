@@ -106,6 +106,15 @@ if (mainSrc) {
   );
 }
 
+/* Any other URL (a case study, the admin) is served this same file by the
+   SPA fallback, so the landing markup is hidden until React has rendered the
+   right page, instead of flashing the home page first. */
+page = page.replace(
+  "</head>",
+  `<style>html.not-home #root{visibility:hidden}</style>` +
+    `<script>if(location.pathname.replace(/\\/+$/,"")!==""){document.documentElement.classList.add("not-home")}</script></head>`,
+);
+
 fs.writeFileSync(indexPath, page);
 console.log(
   `prerender: wrote ${(html.length / 1024).toFixed(1)} KB of markup into build/index.html`,

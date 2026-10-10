@@ -29,6 +29,10 @@ export const NAV = [
 ];
 
 export const HERO = {
+  /* what sits beside the headline on wide screens: "stack" (three project
+     covers fanned out), "field" (a point field behind the hero) or "engine"
+     (the matching engine's live order book) */
+  visual: "stack",
   lead: "I build and ship",
   phrases: [
     "booking systems.",
@@ -67,89 +71,50 @@ export const STATS = [
    cannot edit (headline, tags, extra links, the kind of visual) lives here. */
 export const PROJECT_META = {
   "Salon Concierge": {
+    slug: "salon-concierge",
     kicker: "Applied AI",
     headline: "A Telegram concierge that books salon appointments, safely.",
     tags: ["Gemini tool-calling", "Telegram", "Python", "SQLite", "Evals"],
-    visual: "chat",
+    art: "salon",
     links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/Chirag076/salonConciergeBot",
-      },
-      {
-        label: "Demo video",
-        href: "https://drive.google.com/file/d/14jerL5v7q92tbmNTvLsdB3axggYMKE9h/view?usp=sharing",
-      },
+      { label: "GitHub", href: "https://github.com/Chirag076/salonConciergeBot" },
+      { label: "Demo video", href: "https://drive.google.com/file/d/14jerL5v7q92tbmNTvLsdB3axggYMKE9h/view?usp=sharing" },
       { label: "@salonConciergeBot", href: "https://t.me/salonConciergeBot" },
     ],
   },
   "Market-Exchange": {
+    slug: "market-exchange",
     kicker: "Trading infrastructure",
-    headline:
-      "A Binance-style exchange, with the matching engine running in this page.",
-    tags: [
-      "Next.js",
-      "TypeScript",
-      "Redis",
-      "TimescaleDB",
-      "WebSockets",
-      "Docker",
-    ],
-    visual: "image",
-    image: "/images/market-exchange.webp",
-    imageSmall: "/images/market-exchange-800.webp",
+    headline: "A Binance-style exchange, with the matching engine running in this page.",
+    tags: ["Next.js", "TypeScript", "Redis", "TimescaleDB", "WebSockets", "Docker"],
+    art: "exchange",
     engine: true,
     links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/Chirag076/market-exchange-project",
-      },
-      {
-        label: "Architecture",
-        href: "https://github.com/Chirag076/market-exchange-project/blob/main/frontend/public/images/Architecture.png",
-      },
-      {
-        label: "Demo video",
-        href: "https://drive.google.com/file/d/1J85XPY4Rg0yfMa2dtCm4BLFw9kH5Vy0S/view?usp=sharing",
-      },
+      { label: "GitHub", href: "https://github.com/Chirag076/market-exchange-project" },
+      { label: "Architecture", href: "https://github.com/Chirag076/market-exchange-project/blob/main/frontend/public/images/Architecture.png" },
+      { label: "Demo video", href: "https://drive.google.com/file/d/1J85XPY4Rg0yfMa2dtCm4BLFw9kH5Vy0S/view?usp=sharing" },
     ],
   },
   AskDocs: {
+    slug: "askdocs",
     kicker: "RAG",
-    headline:
-      "Ask questions of your own documents, and get an answer that cites them.",
+    headline: "Ask questions of your own documents, and get an answer that cites them.",
     tags: ["FastAPI", "ChromaDB", "Gemini", "RAG", "Docker", "Render"],
-    visual: "json",
+    art: "askdocs",
     links: [
       { label: "GitHub", href: "https://github.com/Chirag076/askdocs" },
       { label: "Live API", href: "https://askdocs-axen.onrender.com/docs" },
     ],
   },
   Talksy: {
+    slug: "talksy",
     kicker: "Real-time",
     headline: "Messaging that re-renders one conversation, not the whole list.",
     tags: ["React", "Node.js", "Socket.IO", "MongoDB", "Zustand"],
-    visual: "image",
-    image: "/images/talksy.webp",
-    imageSmall: "/images/talksy-800.webp",
+    art: "talksy",
     links: [{ label: "GitHub", href: "https://github.com/Chirag076/Talksy" }],
   },
 };
-
-/* the mock conversation drawn in the Salon Concierge card — real menu, real
-   prices from the bot's system prompt, real guardrail behaviour */
-export const CHAT_MOCK = [
-  { from: "user", text: "Book a women's haircut for Riya on Saturday at 3 PM" },
-  {
-    from: "bot",
-    text: "Done — Haircut (women), Rs 800, for Riya on Saturday at 3:00 PM. Your booking ID is 42.",
-  },
-  { from: "user", text: "Do you do tattoos?" },
-  {
-    from: "bot",
-    text: "Sorry, we don't offer tattoos. I can help with haircuts, colour, facials, bridal makeup, manicures and pedicures.",
-  },
-];
 
 export const PRINCIPLES = [
   {
