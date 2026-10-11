@@ -9,11 +9,18 @@
   defaults are rewritten, the database still holds the old text until it is
   updated — through the admin dashboard, one field at a time, or with this.
 
-    node scripts/sync-content.js           show what would change, write nothing
-    node scripts/sync-content.js --write   write it
+    node scripts/sync-content.js                      show what would change, write nothing
+    node scripts/sync-content.js --write --code 123456   write it through the live site's
+                                                      admin API, with a fresh 2FA code
+    node scripts/sync-content.js --write              write it straight into MongoDB
+                                                      (needs MONGODB_URI)
 
-  Reads MONGODB_URI from the environment or from .env / .env.local in the
-  project root. Never prints the connection string or any password.
+  Through the API (the default when --code is given, or when MONGODB_URI is
+  not set) it talks to https://chiragchhabra.vercel.app/api/content, exactly
+  like the dashboard's Save button: a valid 2FA code authorises the write,
+  or ADMIN_PASSWORD from .env when two-factor is off. Set SITE_URL to point
+  it somewhere else. Reads .env / .env.local in the project root. Never
+  prints the connection string, the password or the code.
 
   Rules: the curated projects (matched by title) and roles (matched by
   company) take the code's text; projects or roles that exist only in the
@@ -154,55 +161,140 @@ const describe = (defaults, current, next) => {
   return lines;
 };
 
+/* --- command line --- */
+const arg = (name) => {
+  const i = process.argv.findIndex((a) => a === name || a.startsWith(`${name}=`));
+  if (i < 0) return undefined;
+  const a = process.argv[i];
+  return a.includes("=") ? a.slice(a.indexOf("=") + 1) : process.argv[i + 1];
+};
+
+/* the two ways to reach the document: straight into MongoDB, or through the
+   site's own admin API. Both return { read(), write(changes) }. */
+const viaDatabase = (uri) => {
+  const { MongoClient } = require("mongodb");
+  const client = new MongoClient(uri, { serverSelectionTimeoutMS: 15000 });
+  const collection = () => client.db("portfolio_db").collection("content");
+  return {
+    label: "the database",
+    read: async () => {
+      await client.connect();
+      return (await collection().findOne({ _id: "main_content" })) || {};
+    },
+    write: async (changes) => {
+      await collection().updateOne(
+        { _id: "main_content" },
+        { $set: { ...changes, updatedAt: new Date() } },
+        { upsert: true },
+      );
+    },
+    close: () => client.close(),
+  };
+};
+
+const viaApi = (site, code, password) => {
+  const url = `${site.replace(/\/+$/, "")}/api/content`;
+  const check = async (res) => {
+    let data = {};
+    try {
+      data = await res.json();
+    } catch (e) {
+      /* a non-JSON error page */
+    }
+    if (!res.ok || data.error) {
+      const why = String(
+        data.details || data.error || `${res.status} ${res.statusText}`,
+      ).replace(/\.$/, "");
+      if (res.status === 401)
+        throw new Error(
+          `the site refused the write: ${why}. Codes last 30 seconds — run again with a fresh one.`,
+        );
+      throw new Error(`${url} answered ${why}`);
+    }
+    return data;
+  };
+  return {
+    label: site,
+    read: async () => check(await fetch(url)),
+    write: async (changes) => {
+      await check(
+        await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            twoFactorCode: code || undefined,
+            password: password || undefined,
+            content: changes,
+          }),
+        }),
+      );
+    },
+    close: async () => {},
+  };
+};
+
 const main = async () => {
   const write = process.argv.includes("--write");
+  const code = arg("--code");
   loadEnv();
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    console.error(
-      "sync-content: MONGODB_URI is not set. Put it in .env (same value as on Vercel) or set it in the shell.",
-    );
+  const site = process.env.SITE_URL || "https://chiragchhabra.vercel.app";
+  const useApi = !!code || process.argv.includes("--api") || !process.env.MONGODB_URI;
+  if (code && !/^\d{6}$/.test(code)) {
+    console.error("sync-content: --code wants the 6 digits from your authenticator app.");
     process.exit(1);
   }
   const defaults = loadDefaults();
-  const { MongoClient } = require("mongodb");
-  const client = new MongoClient(uri);
+  const store = useApi
+    ? viaApi(site, code, process.env.ADMIN_PASSWORD)
+    : viaDatabase(process.env.MONGODB_URI);
   try {
-    await client.connect();
-    const collection = client.db("portfolio_db").collection("content");
-    const current = (await collection.findOne({ _id: "main_content" })) || {};
+    const current = await store.read();
     const { next, changes } = plan(defaults, current);
     const lines = describe(defaults, current, next);
     if (!Object.keys(changes).length) {
-      console.log("sync-content: the database already matches the code. Nothing to do.");
+      console.log(`sync-content: ${store.label} already matches the code. Nothing to do.`);
       return;
     }
     console.log(
-      `sync-content: ${Object.keys(changes).join(", ")} differ from the code:`,
+      `sync-content: ${Object.keys(changes).join(", ")} on ${store.label} differ from the code:`,
     );
     for (const l of lines) console.log(l);
     if (!write) {
       console.log(
-        "\nDry run — nothing written. Run again with --write to update the live site.",
+        `\nDry run — nothing written. Run again with --write${
+          useApi && current.has2FA ? " --code <6 digits from your authenticator>" : ""
+        } to update the live site.`,
       );
       return;
     }
-    await collection.updateOne(
-      { _id: "main_content" },
-      { $set: { ...changes, updatedAt: new Date() } },
-      { upsert: true },
-    );
+    if (useApi && current.has2FA && !code) {
+      console.error(
+        "\nTwo-factor is on for the dashboard, so the write needs --code <6 digits from your authenticator>.",
+      );
+      process.exit(1);
+    }
+    if (useApi && !current.has2FA && !code && !process.env.ADMIN_PASSWORD) {
+      console.error(
+        "\nThe write needs the admin password: put ADMIN_PASSWORD in .env (never on the command line).",
+      );
+      process.exit(1);
+    }
+    await store.write(changes);
     console.log(
       `\nWritten. The live site shows the new ${Object.keys(changes).join(", ")} on its next load.`,
     );
   } finally {
-    await client.close();
+    await store.close();
   }
 };
 
 if (require.main === module) {
   main().catch((err) => {
-    console.error(`sync-content: ${err.message}`);
+    const why =
+      err.message === "fetch failed"
+        ? `could not reach the site (${(err.cause && err.cause.code) || "network error"}) — check the connection and try again`
+        : err.message;
+    console.error(`sync-content: ${why}`);
     process.exit(1);
   });
 }
