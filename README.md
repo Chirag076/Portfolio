@@ -40,4 +40,5 @@ The API routes need `MONGODB_URI` (and `ADMIN_PASSWORD` until a password is set 
 
 - Words, numbers, stack, principles, recommendations: `src/data/site.js`.
 - Projects and experience: defaults in `src/context/PortfolioContext.jsx`; the admin dashboard can edit any project by title and add new ones, but the four curated projects always show.
+- The live site reads projects and experience from MongoDB, and what is saved there wins over the defaults. After changing the defaults, push them to the database with `npm run sync-content` (dry run, shows the differences) and `npm run sync-content -- --write` (writes). It needs `MONGODB_URI` in `.env`; it keeps anything you added only in the dashboard, and never touches the password, 2FA or visitor count.
 - Project visuals: `public/images/<name>.webp` (1200×675) plus an optional `<name>-800.webp` for phones.

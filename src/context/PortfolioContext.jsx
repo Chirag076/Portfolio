@@ -103,6 +103,15 @@ const defaultSocialLinks = {
   email: "mailto:chiragchhabrahmo@gmail.com",
 };
 
+/* what `node scripts/sync-content.js` writes to the database, so the live
+   site and this file say the same thing */
+export const DEFAULT_CONTENT = {
+  projects: defaultProjects,
+  services: defaultServices,
+  experience: defaultExperience,
+  socialLinks: defaultSocialLinks,
+};
+
 /* old PNG paths saved in the database point at files that no longer exist */
 const fixImage = (src = "") => src.replace(/\.png$/i, ".webp");
 

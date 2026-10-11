@@ -23,7 +23,8 @@
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "prestart": "node scripts/art.js"
+    "prestart": "node scripts/art.js",
+    "sync-content": "node scripts/sync-content.js"
   },
   "eslintConfig": {
     "extends": [
