@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { usePortfolio } from "../context/PortfolioContext";
 import { PROJECT_META } from "../data/site";
 import { Link } from "../lib/router";
-import ProjectArt, { ART_COLORS } from "./ProjectArt";
+import ProjectArt from "./ProjectArt";
 
 /* The right-hand side of the hero: three project covers fanned like cards.
    They are real links into the case studies, they tilt a little with the
@@ -69,14 +69,16 @@ const HeroStack = () => {
     <div ref={ref} className="stack" aria-label="Selected work">
       {cards.map(({ p, meta }, i) => (
         <div key={p.id || p.title} className="stack-item" style={{ "--i": i }}>
-          <Link
-            href={`/work/${meta.slug}`}
-            data-cursor="open"
-            className="stack-card"
-            aria-label={`${p.title} — open the case study`}
-          >
-            <ProjectArt kind={meta.art} color={ART_COLORS[meta.art]} />
-          </Link>
+          <div className="stack-card">
+            <ProjectArt kind={meta.art} title={p.title} />
+            {/* the link is a plain overlay, so the art's labels are not its text */}
+            <Link
+              href={`/work/${meta.slug}`}
+              data-cursor="open"
+              className="absolute inset-0"
+              aria-label={`${p.title} — open the case study`}
+            />
+          </div>
           <span className="stack-label t-mono-xs" aria-hidden="true">
             <span className="text-ink-3">{String(i + 1).padStart(2, "0")}</span>{" "}
             {p.title}

@@ -20,7 +20,8 @@ const ClientOnly = ({ children }) => {
 
 const Hero = () => {
   const { setShowResume } = usePortfolio();
-  const visual = HERO.visual || "stack";
+  /* "stack", "field", "engine", or a combination such as "stack+field" */
+  const visual = new Set((HERO.visual || "stack").split("+"));
   const phrases = [...HERO.phrases, HERO.phrases[0]]; // the loop lands back on the first without a jump
 
   const toWork = (e) => {
@@ -35,7 +36,7 @@ const Hero = () => {
       id="top"
       className="relative flex min-h-[100svh] flex-col justify-end pt-[calc(var(--nav-h)+2.5rem)]"
     >
-      {visual === "field" && (
+      {visual.has("field") && (
         <ClientOnly>
           <HeroField />
         </ClientOnly>
@@ -121,14 +122,14 @@ const Hero = () => {
         </div>
 
         {/* the right column on wide screens */}
-        {visual === "stack" && (
+        {visual.has("stack") && (
           <div className="hidden lg:col-span-5 lg:block">
             <ClientOnly>
               <HeroStack />
             </ClientOnly>
           </div>
         )}
-        {visual === "engine" && (
+        {!visual.has("stack") && visual.has("engine") && (
           <div className="hidden lg:col-span-5 lg:block">
             <ClientOnly>
               <HeroEngine />

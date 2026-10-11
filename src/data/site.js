@@ -29,10 +29,11 @@ export const NAV = [
 ];
 
 export const HERO = {
-  /* what sits beside the headline on wide screens: "stack" (three project
-     covers fanned out), "field" (a point field behind the hero) or "engine"
-     (the matching engine's live order book) */
-  visual: "stack",
+  /* what fills the hero on wide screens: "stack" (three project covers
+     fanned out), "field" (a point field behind the whole hero), "engine"
+     (the matching engine's live order book), or a combination joined with
+     "+", e.g. "stack+field" or "engine+field" */
+  visual: "stack+field",
   lead: "I build and ship",
   phrases: [
     "booking systems.",
